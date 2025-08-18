@@ -15,7 +15,7 @@ body {
   min-height:100vh;
   margin:0;
   color:white;
-  cursor: default; /* always show cursor */
+  cursor: default;
 }
 
 .container{
@@ -108,7 +108,15 @@ button:focus{outline:none;}
   <div id="categories-view" class="grid-horizontal scrollbar-thin"></div>
 
   <!-- Channels -->
-  <div id="channels-view" class="grid-horizontal scrollbar-thin hidden"></div>
+  <div id="channels-view" class="hidden">
+    <div class="mb-4 flex justify-between items-center">
+      <input id="search-input" type="text" placeholder="Search channels..." class="px-3 py-2 rounded w-64 text-black">
+      <button id="back-to-categories" class="px-4 py-2 bg-purple-500 rounded flex items-center">
+        <i class="fas fa-arrow-left mr-2"></i> Back
+      </button>
+    </div>
+    <div id="channels-list" class="grid-horizontal scrollbar-thin"></div>
+  </div>
 
   <!-- Player -->
   <div id="player-view" class="hidden">
@@ -142,23 +150,24 @@ button:focus{outline:none;}
 // Elements
 const categoriesView = document.getElementById('categories-view');
 const channelsView = document.getElementById('channels-view');
+const channelsList = document.getElementById('channels-list');
 const playerView = document.getElementById('player-view');
 const videoPlayer = document.getElementById('video-player');
 const backToChannels = document.getElementById('back-to-channels');
+const backToCategories = document.getElementById('back-to-categories');
 const channelName = document.getElementById('channel-name');
 const playingLogo = document.getElementById('playing-logo');
 const playingChannel = document.getElementById('playing-channel');
 const playingCategory = document.getElementById('playing-category');
 const loading = document.getElementById('loading');
+const searchInput = document.getElementById('search-input');
 
 // State
 let data = {};
 let categoryItems = [];
 let channelItems = [];
-let focusIndex = 0;
 let currentCategory = '';
 let currentHls = null;
-let currentPlayingChannel = null;
 
 // Category Icons
 const categoryIcons = {
@@ -167,11 +176,12 @@ const categoryIcons = {
     "Movies":"fa-film",
     "Music":"fa-music",
     "Kids":"fa-child",
-    "Religion":"fa-star-and-crescent", // Islam icon
+    "Religion":"fa-star-and-crescent",
     "Business":"fa-briefcase",
     "Documentary":"fa-book",
     "Comedy":"fa-mask",
     "Cooking":"fa-utensils",
+    "Maghreb":"fa-flag",
     "Other":"fa-tv"
 };
 
@@ -186,7 +196,6 @@ async function loadPlaylist(){
             if(lines[i].startsWith("#EXTINF")){
                 const catMatch = lines[i].match(/group-title="(.*?)"/);
                 let category = catMatch ? catMatch[1] : "Other";
-                // normalize categories
                 if(category.toLowerCase().includes("religion")) category="Religion";
                 else if(category.toLowerCase().includes("business")) category="Business";
                 else if(category.toLowerCase().includes("doc")) category="Documentary";
@@ -196,6 +205,7 @@ async function loadPlaylist(){
                 else if(category.toLowerCase().includes("movie")) category="Movies";
                 else if(category.toLowerCase().includes("music")) category="Music";
                 else if(category.toLowerCase().includes("sport")) category="Sports";
+                else if(category.toLowerCase().includes("maghreb")) category="Maghreb";
                 const nameMatch = lines[i].match(/,(.*)$/);
                 const name = nameMatch ? nameMatch[1].trim() : "Unnamed";
                 const logoMatch = lines[i].match(/tvg-logo="(.*?)"/);
@@ -206,6 +216,18 @@ async function loadPlaylist(){
                 data[category].push({name,url,logo});
             }
         }
+
+        // Add custom Maghreb channels
+        data["Maghreb"] = [
+            {name:"AL AOULA LAÂYOUNE الأولى", logo:"https://i.ibb.co/n0Pwp2S/alaoulainter.png", url:"https://cdn.live.easybroadcast.io/abr_corp/73_laayoune_pgagr52/corp/73_laayoune_pgagr52_480p/chunks_dvr.m3u8"},
+            {name:"2M MONDE الثانية", logo:"https://i.ibb.co/dp5Z2dh/2m.png", url:"https://cdn-globecast.akamaized.net/live/eds/2m_monde/hls_video_ts_tuhawxpiemz257adfc/2m_monde.m3u8"},
+            {name:"ARRYADIA الرياضية", logo:"https://i.ibb.co/Wk8BWg4/arryadia.png", url:"https://cdn.live.easybroadcast.io/ts_corp/73_arryadia_k2tgcj0/playlist_dvr.m3u8"},
+            {name:"AL MAGHRIBIA المغربية الإخبارية", logo:"https://i.ibb.co/5kp5CmP/almaghribia.png", url:"https://cdn.live.easybroadcast.io/abr_corp/73_almaghribia_83tz85q/corp/73_almaghribia_83tz85q_480p/chunks_dvr.m3u8"},
+            {name:"ASSADISSA القرآن الكريم", logo:"https://i.ibb.co/Gxn4XrB/assadissa.png", url:"https://cdn.live.easybroadcast.io/abr_corp/73_assadissa_7b7u5n1/corp/73_assadissa_7b7u5n1_480p/chunks_dvr.m3u8"},
+            {name:"TAMAZIGHT الأمازيغية", logo:"https://i.ibb.co/rmRc08Z/tamazight.png", url:"https://cdn.live.easybroadcast.io/ts_corp/73_tamazight_tccybxt/playlist_dvr.m3u8"},
+            {name:"MEDI 1 MG العربية", logo:"https://i.ibb.co/rQJcGTc/medi1tv.png", url:"https://streaming1.medi1tv.com/live/smil:medi1tv.smil/playlist.m3u8"}
+        ];
+
         showCategories();
     }catch(e){ console.error(e); alert("Failed to load playlist"); }
 }
@@ -222,96 +244,91 @@ function showCategories(){
         const icon = categoryIcons[cat]||"fa-tv";
         const card = document.createElement('div');
         card.className='card p-4 flex flex-col items-center';
-        card.innerHTML=`<div class="w-16 h-16 rounded-full bg-purple-500 flex items-center justify-center mb-3">
-            <i class="fas ${icon} text-2xl"></i>
-        </div><h3 class="font-semibold">${cat}</h3><p class="text-xs text-gray-400 mt-1">${data[cat].length} channels</p>`;
+        card.innerHTML=`<div class="w-16 h-16 mb-2 flex justify-center items-center text-2xl"><i class="fas ${icon}"></i></div>
+                        <p class="text-center">${cat}</p>`;
         card.addEventListener('click',()=>showChannels(cat));
         categoriesView.appendChild(card);
         categoryItems.push(card);
     });
-    focusIndex=0;
-    updateFocus(categoryItems);
 }
 
 // Show channels
 function showChannels(cat){
-    currentCategory = cat;
-    loading.classList.add('hidden');
+    currentCategory=cat;
     categoriesView.classList.add('hidden');
     channelsView.classList.remove('hidden');
     playerView.classList.add('hidden');
-    channelsView.innerHTML='';
-    
-    // Back button
-    const backBtn = document.createElement('button');
-    backBtn.textContent = '← Back to Categories';
-    backBtn.className = 'mb-4 px-4 py-2 bg-purple-500 rounded';
-    backBtn.addEventListener('click', () => { stopCurrentVideo(); showCategories(); });
-    channelsView.appendChild(backBtn);
-
+    channelsList.innerHTML='';
     channelItems=[];
     data[cat].forEach(ch=>{
-        const card = document.createElement('div');
-        card.className='card p-3';
-        card.innerHTML=`<div class="channel-logo mb-3 flex items-center justify-center">
-            ${ch.logo?`<img src="${ch.logo}" alt="${ch.name}" class="w-full h-full object-contain p-2">`:`<i class="fas fa-play-circle text-4xl text-gray-400"></i>`}
-        </div><h3 class="font-medium">${ch.name}</h3>`;
+        const card=document.createElement('div');
+        card.className='card p-2';
+        card.innerHTML=`<img class="channel-logo mb-2" src="${ch.logo||''}" alt="${ch.name}"><p>${ch.name}</p>`;
         card.addEventListener('click',()=>playChannel(ch));
-        channelsView.appendChild(card);
+        channelsList.appendChild(card);
         channelItems.push(card);
     });
-    focusIndex=0;
-    updateFocus(channelItems);
+    searchInput.value='';
 }
 
 // Play channel
-function playChannel(channel){
-    stopCurrentVideo();
+function playChannel(ch){
     categoriesView.classList.add('hidden');
     channelsView.classList.add('hidden');
     playerView.classList.remove('hidden');
+    channelName.textContent=ch.name;
+    playingLogo.src=ch.logo||'';
+    playingChannel.textContent=ch.name;
+    playingCategory.textContent=currentCategory;
 
-    currentPlayingChannel = channel;
-    channelName.textContent = channel.name;
-    playingLogo.src = channel.logo||"";
-    playingChannel.textContent = channel.name;
-    playingCategory.textContent = currentCategory;
+    if(currentHls){ currentHls.destroy(); currentHls=null; }
 
     if(Hls.isSupported()){
-        currentHls = new Hls();
-        currentHls.loadSource(channel.url);
+        currentHls=new Hls({
+            maxBufferLength: 10,
+            maxMaxBufferLength: 30,
+            maxBufferSize: 30*1000*1000,
+            startLevel: 0,
+            capLevelToPlayerSize: true
+        });
+        currentHls.loadSource(ch.url);
         currentHls.attachMedia(videoPlayer);
+        currentHls.on(Hls.Events.MANIFEST_PARSED,()=>videoPlayer.play());
     }else{
-        videoPlayer.src = channel.url;
+        videoPlayer.src=ch.url;
+        videoPlayer.play();
     }
-    videoPlayer.play();
-    videoPlayer.requestFullscreen();
+
+    // Auto fullscreen
+    if(videoPlayer.requestFullscreen) videoPlayer.requestFullscreen();
+    else if(videoPlayer.webkitRequestFullscreen) videoPlayer.webkitRequestFullscreen();
+    else if(videoPlayer.msRequestFullscreen) videoPlayer.msRequestFullscreen();
 }
 
-// Stop current video
-function stopCurrentVideo(){
-    if(currentHls){currentHls.destroy(); currentHls=null;}
+// Back buttons
+backToChannels.addEventListener('click',()=>{
+    if(currentHls){ currentHls.destroy(); currentHls=null; }
     videoPlayer.pause();
     videoPlayer.src="";
-}
-
-// Keyboard navigation
-document.addEventListener('keydown',e=>{
-    if(e.key==='ArrowRight'){ focusIndex = (focusIndex+1)%categoryItems.length; updateFocus(categoryItems); }
-    if(e.key==='ArrowLeft'){ focusIndex = (focusIndex-1+categoryItems.length)%categoryItems.length; updateFocus(categoryItems); }
-    if(e.key==='Enter'){ categoryItems[focusIndex].click(); }
+    playerView.classList.add('hidden');
+    showChannels(currentCategory);
 });
 
-// Update focus
-function updateFocus(items){
-    items.forEach((c,i)=>c.classList.remove('focused'));
-    if(items[focusIndex]) items[focusIndex].classList.add('focused');
-}
+backToCategories.addEventListener('click',()=>{
+    channelsView.classList.add('hidden');
+    showCategories();
+});
 
-// Back button
-backToChannels.addEventListener('click',()=>{ stopCurrentVideo(); showChannels(currentCategory); });
+// Search
+searchInput.addEventListener('input',(e)=>{
+    const query = e.target.value.toLowerCase();
+    channelItems.forEach(card=>{
+        const name = card.querySelector('p').textContent.toLowerCase();
+        card.style.display=name.includes(query)?'block':'none';
+    });
+});
 
-// Start
+// Initial load
 loadPlaylist();
 </script>
 </body>
