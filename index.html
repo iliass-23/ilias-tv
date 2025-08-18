@@ -3,275 +3,315 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ILIAS-TV</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<title>ILIAS-TV - Arabic IPTV Player</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-  body {
-    margin: 0;
-    font-family: 'Roboto', sans-serif;
-    background: linear-gradient(135deg, #1f1c2c, #4b3c69, #ff5ca2);
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-  header {
-    text-align: center;
-    padding: 25px 10px;
-    font-size: 2.5rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-  }
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg,#0F172A,#1E293B,#4C1D95);
+  min-height:100vh;
+  margin:0;
+  color:white;
+  cursor: default; /* always show cursor */
+}
 
-  .menu, .channels {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 25px;
-    padding: 25px;
-    flex: 1;
-    overflow-y: auto;
-  }
+.container{
+  max-width:1200px;
+  margin:0 auto;
+  padding:20px;
+}
 
-  .item {
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(16px);
-    border-radius: 24px;
-    padding: 15px;
-    text-align: center;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: transform 0.25s, background 0.25s;
-    border: 1px solid rgba(255,255,255,0.12);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 140px;
-  }
+.grid-horizontal{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:1rem;
+}
 
-  .item img {
-    width: 100px;
-    height: 80px;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    object-fit: contain; /* show full logo */
-    background: rgba(0,0,0,0.2);
-  }
+.card{
+  border-radius:16px;
+  overflow:hidden;
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,0.1);
+  text-align:center;
+  cursor:pointer;
+  transition:all 0.3s ease;
+}
 
-  .item i {
-    font-size: 2.2rem;
-    margin-bottom: 10px;
-    color: #fff;
-    opacity: 0.8;
-  }
+.card:hover{
+  background:rgba(255,255,255,0.1);
+  transform:translateY(-5px);
+}
 
-  .item:hover, .active {
-    background: rgba(255,255,255,0.12);
-    transform: scale(1.08);
-    color: #000;
-  }
+.channel-logo{
+  width:100%;
+  height:100px;
+  object-fit:contain;
+  background:rgba(0,0,0,0.2);
+}
 
-  video {
-    width: 95%;
-    max-width: 1200px;
-    margin: 30px auto;
-    display: block;
-    border-radius: 24px;
-    background: black;
-    border: 1px solid rgba(255,255,255,0.12);
-  }
+.video-container{
+  border-radius:16px;
+  overflow:hidden;
+  background:#000;
+  border:1px solid rgba(255,255,255,0.1);
+}
 
-  button {
-    display: block;
-    margin: 20px auto;
-    padding: 15px 30px;
-    border-radius: 15px;
-    border: none;
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-    font-weight: 700;
-    cursor: pointer;
-    font-size: 1.1rem;
-    transition: background 0.25s, transform 0.2s;
-  }
+.focused{
+  outline:3px solid #8B5CF6;
+  outline-offset:-3px;
+}
 
-  button:hover {
-    background: rgba(255,255,255,0.2);
-    transform: scale(1.05);
-    color: #000;
-  }
+.playing{
+  border:2px solid #8B5CF6;
+  box-shadow:0 0 15px rgba(139,92,246,0.5);
+}
 
-  #loading {
-    text-align: center;
-    font-size: 1.4rem;
-    padding: 15px;
-  }
+.scrollbar-thin::-webkit-scrollbar{
+  width:8px;
+}
+.scrollbar-thin::-webkit-scrollbar-track{
+  background:rgba(255,255,255,0.05);
+  border-radius:4px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb{
+  background:rgba(139,92,246,0.5);
+  border-radius:4px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover{
+  background:rgba(139,92,246,0.8);
+}
 
-  footer {
-    text-align: center;
-    padding: 20px;
-    background: rgba(0,0,0,0.25);
-    font-size: 1rem;
-  }
-
-  footer span.heart {
-    color: red;
-  }
-
-  .menu::-webkit-scrollbar, .channels::-webkit-scrollbar {
-    width: 10px;
-  }
-  .menu::-webkit-scrollbar-thumb, .channels::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.2);
-    border-radius: 5px;
-  }
+button:focus{outline:none;}
 </style>
 </head>
 <body>
+<div class="container">
+<header class="text-center mb-6">
+  <div class="flex justify-center items-center mb-3 space-x-3">
+    <i class="fas fa-tv text-4xl text-purple-500"></i>
+    <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">ILIAS-TV</h1>
+  </div>
+  <p class="text-gray-300">Premium Arabic IPTV Streaming Experience</p>
+</header>
 
-<header>ILIAS-TV</header>
-<div id="app"></div>
-<div id="loading" style="display:none;">Loading stream...</div>
-<footer>ILIAS-TV | Made with <span class="heart">❤️</span> for Arabic TV lovers</footer>
+<main id="app">
+  <div id="loading" class="text-center py-12 hidden">
+    <div class="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+    <p>Loading channels...</p>
+  </div>
+
+  <!-- Categories -->
+  <div id="categories-view" class="grid-horizontal scrollbar-thin"></div>
+
+  <!-- Channels -->
+  <div id="channels-view" class="grid-horizontal scrollbar-thin hidden"></div>
+
+  <!-- Player -->
+  <div id="player-view" class="hidden">
+    <div class="mb-4 flex justify-between items-center">
+      <h2 id="channel-name" class="text-2xl font-bold"></h2>
+      <button id="back-to-channels" class="px-4 py-2 bg-purple-500 rounded flex items-center">
+        <i class="fas fa-arrow-left mr-2"></i> Back
+      </button>
+    </div>
+    <div class="video-container mb-4">
+      <video id="video-player" class="w-full" controls autoplay></video>
+    </div>
+    <div class="bg-gray-800 bg-opacity-50 rounded-xl p-4 flex items-center space-x-4">
+      <img id="playing-logo" class="w-16 h-16 rounded-lg" src="" alt="Logo">
+      <div>
+        <p id="playing-channel" class="font-medium"></p>
+        <p id="playing-category" class="text-gray-300 text-sm"></p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="text-center mt-6 py-6 border-t border-gray-800">
+  <p>Made with <span class="text-red-500">❤️</span> for Arabic TV lovers</p>
+  <p class="text-gray-500 text-sm mt-2">© 2025 ILIAS-TV. All rights reserved.</p>
+</footer>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script>
-const playlistUrl = "https://iptv-org.github.io/iptv/languages/ara.m3u";
-const app = document.getElementById("app");
-const loading = document.getElementById("loading");
+// Elements
+const categoriesView = document.getElementById('categories-view');
+const channelsView = document.getElementById('channels-view');
+const playerView = document.getElementById('player-view');
+const videoPlayer = document.getElementById('video-player');
+const backToChannels = document.getElementById('back-to-channels');
+const channelName = document.getElementById('channel-name');
+const playingLogo = document.getElementById('playing-logo');
+const playingChannel = document.getElementById('playing-channel');
+const playingCategory = document.getElementById('playing-category');
+const loading = document.getElementById('loading');
+
+// State
 let data = {};
+let categoryItems = [];
+let channelItems = [];
 let focusIndex = 0;
-let items = [];
-let currentVideo = null;
+let currentCategory = '';
 let currentHls = null;
+let currentPlayingChannel = null;
 
-async function loadPlaylist() {
-  try {
-    const res = await fetch(playlistUrl);
-    const text = await res.text();
-    const lines = text.split(/\r?\n/);
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      if (line.startsWith("#EXTINF")) {
-        const categoryMatch = line.match(/group-title="(.*?)"/);
-        const category = categoryMatch ? categoryMatch[1] : "Other";
-        const nameMatch = line.match(/,(.*)$/);
-        const name = nameMatch ? nameMatch[1].trim() : "Unnamed";
-        let url = lines[i + 1] ? lines[i + 1].trim() : null;
-        if (!url || url.startsWith("#")) continue;
-        const logoMatch = line.match(/tvg-logo="(.*?)"/);
-        const logo = logoMatch ? logoMatch[1] : null;
-        if (!data[category]) data[category] = [];
-        data[category].push({ name, url, logo });
-      }
+// Category Icons
+const categoryIcons = {
+    "News":"fa-newspaper",
+    "Sports":"fa-futbol",
+    "Movies":"fa-film",
+    "Music":"fa-music",
+    "Kids":"fa-child",
+    "Religion":"fa-star-and-crescent", // Islam icon
+    "Business":"fa-briefcase",
+    "Documentary":"fa-book",
+    "Comedy":"fa-mask",
+    "Cooking":"fa-utensils",
+    "Other":"fa-tv"
+};
+
+// Load playlist
+async function loadPlaylist(){
+    loading.classList.remove('hidden');
+    try{
+        const res = await fetch("https://iptv-org.github.io/iptv/languages/ara.m3u");
+        const text = await res.text();
+        const lines = text.split(/\r?\n/);
+        for(let i=0;i<lines.length;i++){
+            if(lines[i].startsWith("#EXTINF")){
+                const catMatch = lines[i].match(/group-title="(.*?)"/);
+                let category = catMatch ? catMatch[1] : "Other";
+                // normalize categories
+                if(category.toLowerCase().includes("religion")) category="Religion";
+                else if(category.toLowerCase().includes("business")) category="Business";
+                else if(category.toLowerCase().includes("doc")) category="Documentary";
+                else if(category.toLowerCase().includes("comedy")) category="Comedy";
+                else if(category.toLowerCase().includes("cook")) category="Cooking";
+                else if(category.toLowerCase().includes("kids")) category="Kids";
+                else if(category.toLowerCase().includes("movie")) category="Movies";
+                else if(category.toLowerCase().includes("music")) category="Music";
+                else if(category.toLowerCase().includes("sport")) category="Sports";
+                const nameMatch = lines[i].match(/,(.*)$/);
+                const name = nameMatch ? nameMatch[1].trim() : "Unnamed";
+                const logoMatch = lines[i].match(/tvg-logo="(.*?)"/);
+                const logo = logoMatch ? logoMatch[1] : null;
+                const url = lines[i+1] ? lines[i+1].trim() : null;
+                if(!url || url.startsWith("#")) continue;
+                if(!data[category]) data[category]=[];
+                data[category].push({name,url,logo});
+            }
+        }
+        showCategories();
+    }catch(e){ console.error(e); alert("Failed to load playlist"); }
+}
+
+// Show categories
+function showCategories(){
+    loading.classList.add('hidden');
+    categoriesView.classList.remove('hidden');
+    channelsView.classList.add('hidden');
+    playerView.classList.add('hidden');
+    categoriesView.innerHTML='';
+    categoryItems=[];
+    Object.keys(data).forEach(cat=>{
+        const icon = categoryIcons[cat]||"fa-tv";
+        const card = document.createElement('div');
+        card.className='card p-4 flex flex-col items-center';
+        card.innerHTML=`<div class="w-16 h-16 rounded-full bg-purple-500 flex items-center justify-center mb-3">
+            <i class="fas ${icon} text-2xl"></i>
+        </div><h3 class="font-semibold">${cat}</h3><p class="text-xs text-gray-400 mt-1">${data[cat].length} channels</p>`;
+        card.addEventListener('click',()=>showChannels(cat));
+        categoriesView.appendChild(card);
+        categoryItems.push(card);
+    });
+    focusIndex=0;
+    updateFocus(categoryItems);
+}
+
+// Show channels
+function showChannels(cat){
+    currentCategory = cat;
+    loading.classList.add('hidden');
+    categoriesView.classList.add('hidden');
+    channelsView.classList.remove('hidden');
+    playerView.classList.add('hidden');
+    channelsView.innerHTML='';
+    
+    // Back button
+    const backBtn = document.createElement('button');
+    backBtn.textContent = '← Back to Categories';
+    backBtn.className = 'mb-4 px-4 py-2 bg-purple-500 rounded';
+    backBtn.addEventListener('click', () => { stopCurrentVideo(); showCategories(); });
+    channelsView.appendChild(backBtn);
+
+    channelItems=[];
+    data[cat].forEach(ch=>{
+        const card = document.createElement('div');
+        card.className='card p-3';
+        card.innerHTML=`<div class="channel-logo mb-3 flex items-center justify-center">
+            ${ch.logo?`<img src="${ch.logo}" alt="${ch.name}" class="w-full h-full object-contain p-2">`:`<i class="fas fa-play-circle text-4xl text-gray-400"></i>`}
+        </div><h3 class="font-medium">${ch.name}</h3>`;
+        card.addEventListener('click',()=>playChannel(ch));
+        channelsView.appendChild(card);
+        channelItems.push(card);
+    });
+    focusIndex=0;
+    updateFocus(channelItems);
+}
+
+// Play channel
+function playChannel(channel){
+    stopCurrentVideo();
+    categoriesView.classList.add('hidden');
+    channelsView.classList.add('hidden');
+    playerView.classList.remove('hidden');
+
+    currentPlayingChannel = channel;
+    channelName.textContent = channel.name;
+    playingLogo.src = channel.logo||"";
+    playingChannel.textContent = channel.name;
+    playingCategory.textContent = currentCategory;
+
+    if(Hls.isSupported()){
+        currentHls = new Hls();
+        currentHls.loadSource(channel.url);
+        currentHls.attachMedia(videoPlayer);
+    }else{
+        videoPlayer.src = channel.url;
     }
-    showCategories();
-  } catch (err) {
-    app.innerHTML = "<p style='text-align:center;color:red;'>Failed to load playlist.</p>";
-    console.error(err);
-  }
+    videoPlayer.play();
+    videoPlayer.requestFullscreen();
 }
 
-function showCategories() {
-  stopCurrentVideo();
-  app.innerHTML = "<div class='menu'>" +
-    Object.keys(data).map(c => `<div class='item' onclick="showChannels('${c}')"><i class='fas fa-tv'></i>${c}</div>`).join("") +
-    "</div>";
-  focusIndex = 0;
-  updateFocus();
+// Stop current video
+function stopCurrentVideo(){
+    if(currentHls){currentHls.destroy(); currentHls=null;}
+    videoPlayer.pause();
+    videoPlayer.src="";
 }
 
-function showChannels(category) {
-  stopCurrentVideo();
-  app.innerHTML = `<h2 style="text-align:center;margin-top:20px;">${category}</h2>
-    <div class='channels'>` +
-    data[category].map(ch => `<div class='item'>${ch.logo ? `<img src="${ch.logo}">` : `<i class='fas fa-play-circle'></i>`}${ch.name}</div>`).join("") +
-    `</div>
-    <button onclick='showCategories()'>⬅ Back</button>`;
-  
-  data[category].forEach((ch, idx) => {
-    document.querySelectorAll('.channels .item')[idx].onclick = () => playChannel(ch.url);
-  });
-
-  focusIndex = 0;
-  updateFocus();
-}
-
-function playChannel(url) {
-  stopCurrentVideo();
-  app.innerHTML = `<video id="video" controls autoplay></video>
-                   <button onclick='showCategories()'>⬅ Back</button>`;
-  const video = document.getElementById("video");
-  currentVideo = video;
-  loading.style.display = "block";
-
-  if (Hls.isSupported()) {
-    currentHls = new Hls({
-      lowLatencyMode: false,
-      maxBufferLength: 60,
-      maxMaxBufferLength: 120,
-      maxBufferSize: 60*1000*1000,
-      maxBufferHole: 1,
-      autoStartLoad: true,
-      startPosition: -1
-    });
-    currentHls.loadSource(url);
-    currentHls.attachMedia(video);
-    currentHls.on(Hls.Events.MANIFEST_PARSED, () => { loading.style.display="none"; video.play(); });
-    currentHls.on(Hls.Events.FRAG_LOADED, () => { if(video.paused) video.play(); });
-    currentHls.on(Hls.Events.ERROR, (event,data) => {
-      if(data.fatal){ currentHls.destroy(); setTimeout(()=>playChannel(url), 1000); }
-    });
-  } else if(video.canPlayType('application/vnd.apple.mpegurl')){
-    video.src = url;
-    video.addEventListener('loadedmetadata', ()=>{loading.style.display="none"; video.play();});
-  } else {
-    alert("Cannot play this stream"); loading.style.display="none";
-  }
-  video.requestFullscreen?.();
-}
-
-function stopCurrentVideo() {
-  if(currentVideo){
-    currentVideo.pause();
-    currentVideo.src = "";
-    currentVideo.load();
-    currentVideo = null;
-  }
-  if(currentHls){
-    currentHls.destroy(); // stop all streaming and audio
-    currentHls = null;
-  }
-}
-
-function updateFocus() {
-  items = document.querySelectorAll(".item");
-  items.forEach(i => i.classList.remove("active"));
-  if(items[focusIndex]) {
-    items[focusIndex].classList.add("active");
-    items[focusIndex].scrollIntoView({ behavior:"smooth", block:"center" });
-  }
-}
-
-document.addEventListener("keydown", e => {
-  if(!items.length) return;
-  switch(e.key){
-    case "ArrowDown":
-      items[focusIndex].classList.remove("active");
-      focusIndex=(focusIndex+1)%items.length; updateFocus(); break;
-    case "ArrowUp":
-      items[focusIndex].classList.remove("active");
-      focusIndex=(focusIndex-1+items.length)%items.length; updateFocus(); break;
-    case "ArrowRight":
-    case "Enter": items[focusIndex].click(); break;
-    case "Backspace":
-    case "Escape": showCategories(); break;
-  }
+// Keyboard navigation
+document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'){ focusIndex = (focusIndex+1)%categoryItems.length; updateFocus(categoryItems); }
+    if(e.key==='ArrowLeft'){ focusIndex = (focusIndex-1+categoryItems.length)%categoryItems.length; updateFocus(categoryItems); }
+    if(e.key==='Enter'){ categoryItems[focusIndex].click(); }
 });
 
+// Update focus
+function updateFocus(items){
+    items.forEach((c,i)=>c.classList.remove('focused'));
+    if(items[focusIndex]) items[focusIndex].classList.add('focused');
+}
+
+// Back button
+backToChannels.addEventListener('click',()=>{ stopCurrentVideo(); showChannels(currentCategory); });
+
+// Start
 loadPlaylist();
 </script>
 </body>
