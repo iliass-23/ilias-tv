@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ILIAS-TV - Arabic IPTV Player</title>
+<title>ILIAS-TV - Futuristic IPTV</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -15,13 +15,20 @@ body {
   min-height:100vh;
   margin:0;
   color:white;
-  cursor: default;
 }
 
 .container{
   max-width:1200px;
   margin:0 auto;
   padding:20px;
+}
+
+header h1{
+  font-size:3rem;
+  background: linear-gradient(90deg,#8B5CF6,#4C1D95);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight:700;
 }
 
 .grid-horizontal{
@@ -31,43 +38,58 @@ body {
 }
 
 .card{
-  border-radius:16px;
+  border-radius:20px;
   overflow:hidden;
-  background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(10px);
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
   border:1px solid rgba(255,255,255,0.1);
   text-align:center;
   cursor:pointer;
-  transition:all 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .card:hover{
-  background:rgba(255,255,255,0.1);
-  transform:translateY(-5px);
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
 }
 
 .channel-logo{
   width:100%;
   height:100px;
   object-fit:contain;
-  background:rgba(0,0,0,0.2);
+  background: rgba(0,0,0,0.2);
+  border-radius:12px;
 }
 
 .video-container{
-  border-radius:16px;
+  border-radius:20px;
   overflow:hidden;
   background:#000;
   border:1px solid rgba(255,255,255,0.1);
 }
 
-.focused{
-  outline:3px solid #8B5CF6;
-  outline-offset:-3px;
+input#search-input{
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,0.15);
+  padding:0.5rem 1rem;
+  color:white;
+  width:100%;
+  max-width:300px;
+  transition: all 0.3s ease;
+}
+input#search-input:focus{
+  outline:none;
+  border:1px solid #8B5CF6;
+  box-shadow: 0 4px 15px rgba(139,92,246,0.3);
 }
 
-.playing{
-  border:2px solid #8B5CF6;
-  box-shadow:0 0 15px rgba(139,92,246,0.5);
+button{
+  transition: all 0.3s ease;
+}
+button:hover{
+  transform: translateY(-2px);
 }
 
 .scrollbar-thin::-webkit-scrollbar{
@@ -84,8 +106,6 @@ body {
 .scrollbar-thin::-webkit-scrollbar-thumb:hover{
   background:rgba(139,92,246,0.8);
 }
-
-button:focus{outline:none;}
 </style>
 </head>
 <body>
@@ -93,7 +113,7 @@ button:focus{outline:none;}
 <header class="text-center mb-6">
   <div class="flex justify-center items-center mb-3 space-x-3">
     <i class="fas fa-tv text-4xl text-purple-500"></i>
-    <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">ILIAS-TV</h1>
+    <h1>ILIAS-TV</h1>
   </div>
   <p class="text-gray-300">Premium Arabic IPTV Streaming Experience</p>
 </header>
@@ -109,8 +129,8 @@ button:focus{outline:none;}
 
   <!-- Channels -->
   <div id="channels-view" class="hidden">
-    <div class="mb-4 flex justify-between items-center">
-      <input id="search-input" type="text" placeholder="Search channels..." class="px-3 py-2 rounded w-64 text-black">
+    <div class="mb-4 flex justify-between items-center flex-wrap gap-4">
+      <input id="search-input" type="text" placeholder="Search channels...">
       <button id="back-to-categories" class="px-4 py-2 bg-purple-500 rounded flex items-center">
         <i class="fas fa-arrow-left mr-2"></i> Back
       </button>
@@ -120,14 +140,14 @@ button:focus{outline:none;}
 
   <!-- Player -->
   <div id="player-view" class="hidden">
-    <div class="mb-4 flex justify-between items-center">
+    <div class="mb-4 flex justify-between items-center flex-wrap gap-4">
       <h2 id="channel-name" class="text-2xl font-bold"></h2>
       <button id="back-to-channels" class="px-4 py-2 bg-purple-500 rounded flex items-center">
         <i class="fas fa-arrow-left mr-2"></i> Back
       </button>
     </div>
     <div class="video-container mb-4">
-      <video id="video-player" class="w-full" controls autoplay></video>
+      <video id="video-player" class="w-full" controls autoplay playsinline preload="metadata"></video>
     </div>
     <div class="bg-gray-800 bg-opacity-50 rounded-xl p-4 flex items-center space-x-4">
       <img id="playing-logo" class="w-16 h-16 rounded-lg" src="" alt="Logo">
@@ -136,6 +156,7 @@ button:focus{outline:none;}
         <p id="playing-category" class="text-gray-300 text-sm"></p>
       </div>
     </div>
+    <p id="player-hint" class="text-sm text-gray-300 mt-2"></p>
   </div>
 </main>
 
@@ -161,6 +182,7 @@ const playingChannel = document.getElementById('playing-channel');
 const playingCategory = document.getElementById('playing-category');
 const loading = document.getElementById('loading');
 const searchInput = document.getElementById('search-input');
+const playerHint = document.getElementById('player-hint');
 
 // State
 let data = {};
@@ -218,7 +240,8 @@ async function loadPlaylist(){
         }
 
         // Add custom Maghreb channels
-        data["Maghreb"] = [
+        if(!data["Maghreb"]) data["Maghreb"] = [];
+        const maghrebCustom = [
             {name:"AL AOULA LAÂYOUNE الأولى", logo:"https://i.ibb.co/n0Pwp2S/alaoulainter.png", url:"https://cdn.live.easybroadcast.io/abr_corp/73_laayoune_pgagr52/corp/73_laayoune_pgagr52_480p/chunks_dvr.m3u8"},
             {name:"2M MONDE الثانية", logo:"https://i.ibb.co/dp5Z2dh/2m.png", url:"https://cdn-globecast.akamaized.net/live/eds/2m_monde/hls_video_ts_tuhawxpiemz257adfc/2m_monde.m3u8"},
             {name:"ARRYADIA الرياضية", logo:"https://i.ibb.co/Wk8BWg4/arryadia.png", url:"https://cdn.live.easybroadcast.io/ts_corp/73_arryadia_k2tgcj0/playlist_dvr.m3u8"},
@@ -227,6 +250,8 @@ async function loadPlaylist(){
             {name:"TAMAZIGHT الأمازيغية", logo:"https://i.ibb.co/rmRc08Z/tamazight.png", url:"https://cdn.live.easybroadcast.io/ts_corp/73_tamazight_tccybxt/playlist_dvr.m3u8"},
             {name:"MEDI 1 MG العربية", logo:"https://i.ibb.co/rQJcGTc/medi1tv.png", url:"https://streaming1.medi1tv.com/live/smil:medi1tv.smil/playlist.m3u8"}
         ];
+        const existingNames = new Set(data["Maghreb"].map(c=>c.name));
+        maghrebCustom.forEach(c=>{ if(!existingNames.has(c.name)) data["Maghreb"].push(c); });
 
         showCategories();
     }catch(e){ console.error(e); alert("Failed to load playlist"); }
@@ -260,10 +285,13 @@ function showChannels(cat){
     playerView.classList.add('hidden');
     channelsList.innerHTML='';
     channelItems=[];
+    if(!data[cat]) return;
     data[cat].forEach(ch=>{
         const card=document.createElement('div');
         card.className='card p-2';
-        card.innerHTML=`<img class="channel-logo mb-2" src="${ch.logo||''}" alt="${ch.name}"><p>${ch.name}</p>`;
+        card.innerHTML=`<div class="channel-logo mb-2 flex items-center justify-center">
+            ${ch.logo?`<img class="w-full h-full object-contain p-2" src="${ch.logo}" alt="${ch.name}">`:`<i class="fas fa-play-circle text-4xl text-gray-400"></i>`}
+        </div><p>${ch.name}</p>`;
         card.addEventListener('click',()=>playChannel(ch));
         channelsList.appendChild(card);
         channelItems.push(card);
@@ -281,40 +309,47 @@ function playChannel(ch){
     playingChannel.textContent=ch.name;
     playingCategory.textContent=currentCategory;
 
-    if(currentHls){ currentHls.destroy(); currentHls=null; }
+    stopPlayback();
 
     if(Hls.isSupported()){
-        currentHls=new Hls({
-            maxBufferLength: 10,
-            maxMaxBufferLength: 30,
-            maxBufferSize: 30*1000*1000,
-            startLevel: 0,
-            capLevelToPlayerSize: true
-        });
+        currentHls=new Hls();
         currentHls.loadSource(ch.url);
         currentHls.attachMedia(videoPlayer);
-        currentHls.on(Hls.Events.MANIFEST_PARSED,()=>videoPlayer.play());
+        currentHls.on(Hls.Events.MANIFEST_PARSED, ()=>{
+            videoPlayer.play().catch(()=>{});
+            try{ videoPlayer.requestFullscreen?.(); }catch{}
+        });
+        currentHls.on(Hls.Events.ERROR, (event, data)=>{
+          if(data.fatal){
+            switch(data.type){
+              case Hls.ErrorTypes.NETWORK_ERROR: currentHls.startLoad(); break;
+              case Hls.ErrorTypes.MEDIA_ERROR: currentHls.recoverMediaError(); break;
+              default: stopPlayback(); alert('Playback error'); break;
+            }
+          }
+        });
     }else{
         videoPlayer.src=ch.url;
-        videoPlayer.play();
+        videoPlayer.play().catch(()=>{});
     }
+}
 
-    // Auto fullscreen
-    if(videoPlayer.requestFullscreen) videoPlayer.requestFullscreen();
-    else if(videoPlayer.webkitRequestFullscreen) videoPlayer.webkitRequestFullscreen();
-    else if(videoPlayer.msRequestFullscreen) videoPlayer.msRequestFullscreen();
+// Stop playback
+function stopPlayback(){
+    if(currentHls){ try{ currentHls.destroy(); }catch{} currentHls=null; }
+    videoPlayer.pause();
+    videoPlayer.removeAttribute('src');
+    videoPlayer.load();
 }
 
 // Back buttons
 backToChannels.addEventListener('click',()=>{
-    if(currentHls){ currentHls.destroy(); currentHls=null; }
-    videoPlayer.pause();
-    videoPlayer.src="";
+    stopPlayback();
     playerView.classList.add('hidden');
     showChannels(currentCategory);
 });
-
 backToCategories.addEventListener('click',()=>{
+    stopPlayback();
     channelsView.classList.add('hidden');
     showCategories();
 });
@@ -328,7 +363,6 @@ searchInput.addEventListener('input',(e)=>{
     });
 });
 
-// Initial load
 loadPlaylist();
 </script>
 </body>
