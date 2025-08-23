@@ -55,13 +55,13 @@ header h1{
 
 .channel-logo{
   width:100%;
-  height:100px;
+  height:120px;
   object-fit:contain;
   background: rgba(0,0,0,0.2);
   border-radius:12px;
 }
 
-.video-container{
+.video-container, .iframe-container{
   border-radius:20px;
   overflow:hidden;
   background:#000;
@@ -146,8 +146,11 @@ button:hover{
         <i class="fas fa-arrow-left mr-2"></i> Back
       </button>
     </div>
-    <div class="video-container mb-4">
+    <div class="video-container mb-4" id="video-container">
       <video id="video-player" class="w-full" controls autoplay playsinline preload="metadata"></video>
+    </div>
+    <div class="iframe-container mb-4 hidden" id="iframe-container">
+      <iframe id="iframe-player" class="w-full" height="600px" frameborder="0" allowfullscreen></iframe>
     </div>
     <div class="bg-gray-800 bg-opacity-50 rounded-xl p-4 flex items-center space-x-4">
       <img id="playing-logo" class="w-16 h-16 rounded-lg" src="" alt="Logo">
@@ -173,7 +176,10 @@ const categoriesView = document.getElementById('categories-view');
 const channelsView = document.getElementById('channels-view');
 const channelsList = document.getElementById('channels-list');
 const playerView = document.getElementById('player-view');
+const videoContainer = document.getElementById('video-container');
 const videoPlayer = document.getElementById('video-player');
+const iframeContainer = document.getElementById('iframe-container');
+const iframePlayer = document.getElementById('iframe-player');
 const backToChannels = document.getElementById('back-to-channels');
 const backToCategories = document.getElementById('back-to-categories');
 const channelName = document.getElementById('channel-name');
@@ -182,16 +188,13 @@ const playingChannel = document.getElementById('playing-channel');
 const playingCategory = document.getElementById('playing-category');
 const loading = document.getElementById('loading');
 const searchInput = document.getElementById('search-input');
-const playerHint = document.getElementById('player-hint');
 
-// State
 let data = {};
 let categoryItems = [];
 let channelItems = [];
 let currentCategory = '';
 let currentHls = null;
 
-// Category Icons
 const categoryIcons = {
     "News":"fa-newspaper",
     "Sports":"fa-futbol",
@@ -207,7 +210,6 @@ const categoryIcons = {
     "Other":"fa-tv"
 };
 
-// Load playlist
 async function loadPlaylist(){
     loading.classList.remove('hidden');
     try{
@@ -228,6 +230,7 @@ async function loadPlaylist(){
                 else if(category.toLowerCase().includes("music")) category="Music";
                 else if(category.toLowerCase().includes("sport")) category="Sports";
                 else if(category.toLowerCase().includes("maghreb")) category="Maghreb";
+
                 const nameMatch = lines[i].match(/,(.*)$/);
                 const name = nameMatch ? nameMatch[1].trim() : "Unnamed";
                 const logoMatch = lines[i].match(/tvg-logo="(.*?)"/);
@@ -239,25 +242,38 @@ async function loadPlaylist(){
             }
         }
 
-        // Add custom Maghreb channels
-        if(!data["Maghreb"]) data["Maghreb"] = [];
-        const maghrebCustom = [
-            {name:"AL AOULA LAÂYOUNE الأولى", logo:"https://i.ibb.co/n0Pwp2S/alaoulainter.png", url:"https://cdn.live.easybroadcast.io/abr_corp/73_laayoune_pgagr52/corp/73_laayoune_pgagr52_480p/chunks_dvr.m3u8"},
-            {name:"2M MONDE الثانية", logo:"https://i.ibb.co/dp5Z2dh/2m.png", url:"https://cdn-globecast.akamaized.net/live/eds/2m_monde/hls_video_ts_tuhawxpiemz257adfc/2m_monde.m3u8"},
-            {name:"ARRYADIA الرياضية", logo:"https://i.ibb.co/Wk8BWg4/arryadia.png", url:"https://cdn.live.easybroadcast.io/ts_corp/73_arryadia_k2tgcj0/playlist_dvr.m3u8"},
-            {name:"AL MAGHRIBIA المغربية الإخبارية", logo:"https://i.ibb.co/5kp5CmP/almaghribia.png", url:"https://cdn.live.easybroadcast.io/abr_corp/73_almaghribia_83tz85q/corp/73_almaghribia_83tz85q_480p/chunks_dvr.m3u8"},
-            {name:"ASSADISSA القرآن الكريم", logo:"https://i.ibb.co/Gxn4XrB/assadissa.png", url:"https://cdn.live.easybroadcast.io/abr_corp/73_assadissa_7b7u5n1/corp/73_assadissa_7b7u5n1_480p/chunks_dvr.m3u8"},
-            {name:"TAMAZIGHT الأمازيغية", logo:"https://i.ibb.co/rmRc08Z/tamazight.png", url:"https://cdn.live.easybroadcast.io/ts_corp/73_tamazight_tccybxt/playlist_dvr.m3u8"},
-            {name:"MEDI 1 MG العربية", logo:"https://i.ibb.co/rQJcGTc/medi1tv.png", url:"https://streaming1.medi1tv.com/live/smil:medi1tv.smil/playlist.m3u8"}
+        // Custom Maghreb channels
+        if(!data["Maghreb"]) data["Maghreb"]=[];
+        const maghrebCustom=[
+          {name:"AL AOULA LAÂYOUNE الأولى", logo:"https://i.ibb.co/n0Pwp2S/alaoulainter.png", url:"https://cdn.live.easybroadcast.io/abr_corp/73_laayoune_pgagr52/corp/73_laayoune_pgagr52_480p/chunks_dvr.m3u8"},
+          {name:"2M MONDE الثانية", logo:"https://i.ibb.co/dp5Z2dh/2m.png", url:"https://cdn-globecast.akamaized.net/live/eds/2m_monde/hls_video_ts_tuhawxpiemz257adfc/2m_monde.m3u8"},
+          {name:"ARRYADIA الرياضية", logo:"https://i.ibb.co/Wk8BWg4/arryadia.png", url:"https://cdn.live.easybroadcast.io/ts_corp/73_arryadia_k2tgcj0/playlist_dvr.m3u8"},
+          {name:"AL MAGHRIBIA المغربية الإخبارية", logo:"https://i.ibb.co/5kp5CmP/almaghribia.png", url:"https://cdn.live.easybroadcast.io/abr_corp/73_almaghribia_83tz85q/corp/73_almaghribia_83tz85q_480p/chunks_dvr.m3u8"},
+          {name:"ASSADISSA القرآن الكريم", logo:"https://i.ibb.co/Gxn4XrB/assadissa.png", url:"https://cdn.live.easybroadcast.io/abr_corp/73_assadissa_7b7u5n1/corp/73_assadissa_7b7u5n1_480p/chunks_dvr.m3u8"},
+          {name:"TAMAZIGHT الأمازيغية", logo:"https://i.ibb.co/rmRc08Z/tamazight.png", url:"https://cdn.live.easybroadcast.io/ts_corp/73_tamazight_tccybxt/playlist_dvr.m3u8"},
+          {name:"MEDI 1 MG العربية", logo:"https://i.ibb.co/rQJcGTc/medi1tv.png", url:"https://streaming1.medi1tv.com/live/smil:medi1tv.smil/playlist.m3u8"}
         ];
-        const existingNames = new Set(data["Maghreb"].map(c=>c.name));
-        maghrebCustom.forEach(c=>{ if(!existingNames.has(c.name)) data["Maghreb"].push(c); });
+        const existingMaghreb = new Set(data["Maghreb"].map(c=>c.name));
+        maghrebCustom.forEach(c=>{if(!existingMaghreb.has(c.name)) data["Maghreb"].push(c);});
+
+        // Custom Bein Sports channels (iframe)
+        if(!data["Sports"]) data["Sports"]=[];
+        const beinChannels=[
+          {name:"Bein Sports 1", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F201%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-1/"},
+          {name:"Bein Sports 2", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F202%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-2/"},
+          {name:"Bein Sports 3", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F203%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-3/"},
+          {name:"Bein Sports 4", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F204%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-4/"},
+          {name:"Bein Sports 5", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F205%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-5/"},
+          {name:"Bein Sports 6", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F206%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-6/"},
+          {name:"Bein Sports 7", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F207%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-7/"}
+        ];
+        const existingSports = new Set(data["Sports"].map(c=>c.name));
+        beinChannels.forEach(c=>{if(!existingSports.has(c.name)) data["Sports"].push(c);});
 
         showCategories();
-    }catch(e){ console.error(e); alert("Failed to load playlist"); }
+    }catch(e){console.error(e); alert("Failed to load playlist");}
 }
 
-// Show categories
 function showCategories(){
     loading.classList.add('hidden');
     categoriesView.classList.remove('hidden');
@@ -277,7 +293,6 @@ function showCategories(){
     });
 }
 
-// Show channels
 function showChannels(cat){
     currentCategory=cat;
     categoriesView.classList.add('hidden');
@@ -299,7 +314,6 @@ function showChannels(cat){
     searchInput.value='';
 }
 
-// Play channel
 function playChannel(ch){
     categoriesView.classList.add('hidden');
     channelsView.classList.add('hidden');
@@ -311,35 +325,47 @@ function playChannel(ch){
 
     stopPlayback();
 
-    if(Hls.isSupported()){
-        currentHls=new Hls();
-        currentHls.loadSource(ch.url);
-        currentHls.attachMedia(videoPlayer);
-        currentHls.on(Hls.Events.MANIFEST_PARSED, ()=>{
-            videoPlayer.play().catch(()=>{});
-            try{ videoPlayer.requestFullscreen?.(); }catch{}
-        });
-        currentHls.on(Hls.Events.ERROR, (event, data)=>{
-          if(data.fatal){
-            switch(data.type){
-              case Hls.ErrorTypes.NETWORK_ERROR: currentHls.startLoad(); break;
-              case Hls.ErrorTypes.MEDIA_ERROR: currentHls.recoverMediaError(); break;
-              default: stopPlayback(); alert('Playback error'); break;
-            }
-          }
-        });
+    if(ch.iframe){
+        // Use iframe for Bein Sports
+        videoContainer.classList.add('hidden');
+        iframeContainer.classList.remove('hidden');
+        iframePlayer.src=ch.iframe;
     }else{
-        videoPlayer.src=ch.url;
-        videoPlayer.play().catch(()=>{});
+        iframeContainer.classList.add('hidden');
+        videoContainer.classList.remove('hidden');
+        if(Hls.isSupported()){
+            currentHls=new Hls();
+            currentHls.loadSource(ch.url);
+            currentHls.attachMedia(videoPlayer);
+            currentHls.on(Hls.Events.MANIFEST_PARSED, ()=>videoPlayer.play().catch(()=>{}));
+            currentHls.on(Hls.Events.ERROR,(event,data)=>{
+                            if(data.fatal){
+                    switch(data.type){
+                        case Hls.ErrorTypes.NETWORK_ERROR: currentHls.startLoad(); break;
+                        case Hls.ErrorTypes.MEDIA_ERROR: currentHls.recoverMediaError(); break;
+                        default: stopPlayback(); alert('Playback error'); break;
+                    }
+                }
+            });
+        }else{
+            videoPlayer.src = ch.url;
+            videoPlayer.play().catch(()=>{});
+        }
     }
 }
 
-// Stop playback
 function stopPlayback(){
-    if(currentHls){ try{ currentHls.destroy(); }catch{} currentHls=null; }
+    // Stop HLS if exists
+    if(currentHls){ 
+        try{ currentHls.destroy(); }catch{} 
+        currentHls = null; 
+    }
     videoPlayer.pause();
     videoPlayer.removeAttribute('src');
     videoPlayer.load();
+
+    // Stop iframe
+    iframePlayer.src = '';
 }
 
 // Back buttons
@@ -359,7 +385,7 @@ searchInput.addEventListener('input',(e)=>{
     const query = e.target.value.toLowerCase();
     channelItems.forEach(card=>{
         const name = card.querySelector('p').textContent.toLowerCase();
-        card.style.display=name.includes(query)?'block':'none';
+        card.style.display = name.includes(query) ? 'block' : 'none';
     });
 });
 
@@ -367,3 +393,4 @@ loadPlaylist();
 </script>
 </body>
 </html>
+
