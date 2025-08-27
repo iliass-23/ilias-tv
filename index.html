@@ -46,7 +46,6 @@ header h1{
   text-align:center;
   cursor:pointer;
   transition: all 0.3s ease;
-
   aspect-ratio: 1 / 1;
   display: flex;
   flex-direction: column;
@@ -112,7 +111,7 @@ button:hover{
   background:rgba(139,92,246,0.8);
 }
 
-/* Extra responsive tweaks */
+/* Responsive tweaks */
 @media (max-width: 640px) {
   .grid-horizontal {
     grid-template-columns: repeat(2, 1fr);
@@ -129,6 +128,12 @@ button:hover{
   }
 }
 
+/* ✅ Force scrolling on all devices */
+html, body {
+  height: 100%;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+}
 </style>
 </head>
 <body>
@@ -194,6 +199,7 @@ button:hover{
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script>
+
 // Elements
 const categoriesView = document.getElementById('categories-view');
 const channelsView = document.getElementById('channels-view');
@@ -349,7 +355,6 @@ function playChannel(ch){
     stopPlayback();
 
     if(ch.iframe){
-        // Use iframe for Bein Sports
         videoContainer.classList.add('hidden');
         iframeContainer.classList.remove('hidden');
         iframePlayer.src=ch.iframe;
@@ -357,12 +362,12 @@ function playChannel(ch){
         iframeContainer.classList.add('hidden');
         videoContainer.classList.remove('hidden');
         if(Hls.isSupported()){
-            currentHls=new Hls();
+            currentHls = new Hls();
             currentHls.loadSource(ch.url);
             currentHls.attachMedia(videoPlayer);
             currentHls.on(Hls.Events.MANIFEST_PARSED, ()=>videoPlayer.play().catch(()=>{}));
             currentHls.on(Hls.Events.ERROR,(event,data)=>{
-                            if(data.fatal){
+                if(data.fatal){
                     switch(data.type){
                         case Hls.ErrorTypes.NETWORK_ERROR: currentHls.startLoad(); break;
                         case Hls.ErrorTypes.MEDIA_ERROR: currentHls.recoverMediaError(); break;
@@ -378,7 +383,6 @@ function playChannel(ch){
 }
 
 function stopPlayback(){
-    // Stop HLS if exists
     if(currentHls){ 
         try{ currentHls.destroy(); }catch{} 
         currentHls = null; 
@@ -386,8 +390,6 @@ function stopPlayback(){
     videoPlayer.pause();
     videoPlayer.removeAttribute('src');
     videoPlayer.load();
-
-    // Stop iframe
     iframePlayer.src = '';
 }
 
@@ -403,7 +405,7 @@ backToCategories.addEventListener('click',()=>{
     showCategories();
 });
 
-// Search
+// Search filter
 searchInput.addEventListener('input',(e)=>{
     const query = e.target.value.toLowerCase();
     channelItems.forEach(card=>{
@@ -416,5 +418,3 @@ loadPlaylist();
 </script>
 </body>
 </html>
-
-
