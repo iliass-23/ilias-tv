@@ -1,0 +1,23 @@
+Copyright © 2025 ILIAS TV. All Rights Reserved.
+
+This software, including but not limited to its source code, design, user interface, branding, and any associated documentation, is the exclusive property of ILIAS TV (https://iliass-23.github.io/ilias-tv/). It is protected by international copyright laws and treaties.
+
+You are granted a limited, non-exclusive, non-transferable license to install and use this software strictly for personal, non-commercial purposes.
+
+You may NOT, under any circumstances, without the prior written consent of the copyright holder:
+  • Copy, reproduce, redistribute, or publish this software, in whole or in part.  
+  • Modify, adapt, translate, reverse engineer, decompile, or disassemble this software.  
+  • Sell, rent, lease, sublicense, or otherwise exploit this software for commercial purposes.  
+  • Remove, alter, or obscure any copyright, trademark, or proprietary notices from this software.  
+  • Use the software’s name, branding, or design to create derivative works or competing products.  
+
+Any unauthorized use, reproduction, or distribution of this software may result in severe civil and criminal penalties and will be prosecuted to the maximum extent possible under applicable law.
+
+THIS SOFTWARE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. THE COPYRIGHT HOLDER SHALL NOT BE LIABLE FOR ANY DAMAGES ARISING FROM THE USE OR INABILITY TO USE THIS SOFTWARE.
+
+By downloading, installing, or using this software, you acknowledge and agree to abide by the terms of this license. If you do not agree, you must immediately stop using and delete this software.
+
+For licensing inquiries, please contact:  
+Email: iptvkingg23@gmail.com  
+Website: https://iliass-23.github.io/ilias-tv/
+
