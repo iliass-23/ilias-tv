@@ -242,6 +242,7 @@ const categoryIcons = {
 async function loadPlaylist(){
     loading.classList.remove('hidden');
     try{
+        // Load Arabic playlist (ara.m3u)
         const res = await fetch("https://iptv-org.github.io/iptv/languages/ara.m3u");
         const text = await res.text();
         const lines = text.split(/\r?\n/);
@@ -271,23 +272,59 @@ async function loadPlaylist(){
             }
         }
 
-        // Custom Maghreb channels
-        if(!data["Maghreb"]) data["Maghreb"]=[];
-        const maghrebCustom=[
-          {name:"AL AOULA LAÂYOUNE الأولى", logo:"https://i.ibb.co/n0Pwp2S/alaoulainter.png", url:"https://cdn.live.easybroadcast.io/abr_corp/73_laayoune_pgagr52/corp/73_laayoune_pgagr52_480p/chunks_dvr.m3u8"},
-          {name:"2M MONDE الثانية", logo:"https://i.ibb.co/dp5Z2dh/2m.png", url:"https://cdn-globecast.akamaized.net/live/eds/2m_monde/hls_video_ts_tuhawxpiemz257adfc/2m_monde.m3u8"},
-          {name:"ARRYADIA الرياضية", logo:"https://i.ibb.co/Wk8BWg4/arryadia.png", url:"https://cdn.live.easybroadcast.io/ts_corp/73_arryadia_k2tgcj0/playlist_dvr.m3u8"},
-          {name:"AL MAGHRIBIA المغربية الإخبارية", logo:"https://i.ibb.co/5kp5CmP/almaghribia.png", url:"https://cdn.live.easybroadcast.io/abr_corp/73_almaghribia_83tz85q/corp/73_almaghribia_83tz85q_480p/chunks_dvr.m3u8"},
-          {name:"ASSADISSA القرآن الكريم", logo:"https://i.ibb.co/Gxn4XrB/assadissa.png", url:"https://cdn.live.easybroadcast.io/abr_corp/73_assadissa_7b7u5n1/corp/73_assadissa_7b7u5n1_480p/chunks_dvr.m3u8"},
-          {name:"TAMAZIGHT الأمازيغية", logo:"https://i.ibb.co/rmRc08Z/tamazight.png", url:"https://cdn.live.easybroadcast.io/ts_corp/73_tamazight_tccybxt/playlist_dvr.m3u8"},
-          {name:"MEDI 1 MG العربية", logo:"https://i.ibb.co/rQJcGTc/medi1tv.png", url:"https://streaming1.medi1tv.com/live/smil:medi1tv.smil/playlist.m3u8"}
-        ];
-        const existingMaghreb = new Set(data["Maghreb"].map(c=>c.name));
-        maghrebCustom.forEach(c=>{if(!existingMaghreb.has(c.name)) data["Maghreb"].push(c);});
+      // --- Load ALL Moroccan channels (ma.m3u) into Maghreb, robustly ---
+if (!data["Maghreb"]) data["Maghreb"] = [];
 
-        // Custom Bein Sports channels (iframe)
+const resMa = await fetch("https://iptv-org.github.io/iptv/countries/ma.m3u");
+const textMa = await resMa.text();
+const linesMa = textMa.split(/\r?\n/);
+
+// counters (optional)
+let extinfCount = 0;
+let pushedCount = 0;
+
+for (let i = 0; i < linesMa.length; i++) {
+  const line = linesMa[i];
+  if (!line.startsWith("#EXTINF")) continue;
+
+  extinfCount++;
+
+  // Extract name & logo (ignore group-title; we force Maghreb)
+  const nameMatch = line.match(/,(.*)$/);
+  const name = nameMatch ? nameMatch[1].trim() : "Unnamed";
+
+  const logoMatch = line.match(/tvg-logo="(.*?)"/);
+  const logo = logoMatch ? logoMatch[1] : null;
+
+  // Find the first non-empty, non-comment line after #EXTINF => the URL
+  let url = null;
+  let j = i + 1;
+  while (j < linesMa.length) {
+    const candidate = (linesMa[j] || "").trim();
+    if (candidate === "") { j++; continue; }
+    if (candidate.startsWith("#")) { j++; continue; }
+    url = candidate;
+    break;
+  }
+
+  if (!url) continue;               // no playable line found
+  if (url.startsWith("#")) continue; // safety (shouldn’t happen)
+
+  // Don’t dedupe by name (names repeat a lot in iptv-org lists)
+  data["Maghreb"].push({ name, url, logo });
+  pushedCount++;
+
+  // optional: skip ahead to the url line to avoid re-processing
+  i = j;
+}
+
+// Optional debug (check in DevTools console)
+// console.log("ma.m3u EXTINF entries:", extinfCount, "→ pushed to Maghreb:", pushedCount);
+
+
+        // Add Bein Sports iframe channels
         if(!data["Sports"]) data["Sports"]=[];
-        const beinChannels=[
+        const beinChannels = [
           {name:"Bein Sports 1", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F201%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-1/"},
           {name:"Bein Sports 2", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F202%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-2/"},
           {name:"Bein Sports 3", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F203%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-3/"},
@@ -297,11 +334,17 @@ async function loadPlaylist(){
           {name:"Bein Sports 7", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F207%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-7/"}
         ];
         const existingSports = new Set(data["Sports"].map(c=>c.name));
-        beinChannels.forEach(c=>{if(!existingSports.has(c.name)) data["Sports"].push(c);});
+        beinChannels.forEach(c=>{
+            if(!existingSports.has(c.name)) data["Sports"].push(c);
+        });
 
         showCategories();
-    }catch(e){console.error(e); alert("Failed to load playlist");}
+    }catch(e){
+        console.error(e);
+        alert("Failed to load playlist");
+    }
 }
+
 
 function showCategories(){
     loading.classList.add('hidden');
