@@ -137,6 +137,20 @@ html, body {
 </style>
 </head>
 <body>
+
+<!-- Fake Login -->
+<div id="fakeLogin" class="flex flex-col items-center justify-center h-screen text-center">
+  <h2 class="text-2xl font-bold text-purple-400 mb-4">M3U / Xtream Player</h2>
+  <input id="fakeInput" type="text" placeholder="Enter playlist link"
+         class="w-80 p-2 rounded-lg text-black text-center mb-4" />
+  <button onclick="fakeGo()" 
+          class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg shadow-lg">
+    GO
+  </button>
+</div>
+
+<!-- Real Website (hidden at first) -->
+<div id="mainContent" style="display:none;">
 <div class="container">
 <header class="text-center mb-6">
   <div class="flex justify-center items-center mb-3 space-x-3">
@@ -467,5 +481,19 @@ searchInput.addEventListener('input',(e)=>{
 
 loadPlaylist();
 </script>
+
+<script>
+  // Unlock site after 3 GO clicks
+  let goClicks = 0;
+  function fakeGo() {
+    goClicks++;
+    if (goClicks >= 3) {
+      document.getElementById("fakeLogin").style.display = "none";
+      document.getElementById("mainContent").style.display = "block";
+    }
+  }
+</script>
+
+</div> <!-- close #mainContent -->
 </body>
 </html>
