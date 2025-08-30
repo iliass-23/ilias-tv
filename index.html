@@ -134,6 +134,13 @@ html, body {
   overflow-y: auto !important;
   overscroll-behavior: contain;
 }
+/* Remote navigation focus styles */
+.card:focus {
+  outline: 3px solid #8B5CF6;
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.7);
+  z-index: 10;
+}
 </style>
 </head>
 <body>
@@ -192,7 +199,8 @@ html, body {
       <video id="video-player" class="w-full" controls autoplay playsinline preload="metadata"></video>
     </div>
     <div class="iframe-container mb-4 hidden" id="iframe-container">
-      <iframe id="iframe-player" class="w-full" height="600px" frameborder="0" allowfullscreen></iframe>
+      <<iframe id="iframe-player" class="w-full" height="600px" frameborder="0" allowfullscreen 
+        sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
     </div>
     <div class="bg-gray-800 bg-opacity-50 rounded-xl p-4 flex items-center space-x-4">
       <img id="playing-logo" class="w-16 h-16 rounded-lg" src="" alt="Logo">
@@ -294,31 +302,23 @@ async function loadPlaylist(){
             }
         }
 
-      // --- Load ALL Moroccan channels (ma.m3u) into Maghreb, robustly ---
+      // --- Load ALL Moroccan channels (ma.m3u) into Maghreb ---
 if (!data["Maghreb"]) data["Maghreb"] = [];
 
 const resMa = await fetch("https://iptv-org.github.io/iptv/countries/ma.m3u");
 const textMa = await resMa.text();
 const linesMa = textMa.split(/\r?\n/);
 
-// counters (optional)
-let extinfCount = 0;
-let pushedCount = 0;
-
 for (let i = 0; i < linesMa.length; i++) {
   const line = linesMa[i];
   if (!line.startsWith("#EXTINF")) continue;
 
-  extinfCount++;
-
-  // Extract name & logo (ignore group-title; we force Maghreb)
   const nameMatch = line.match(/,(.*)$/);
   const name = nameMatch ? nameMatch[1].trim() : "Unnamed";
 
   const logoMatch = line.match(/tvg-logo="(.*?)"/);
   const logo = logoMatch ? logoMatch[1] : null;
 
-  // Find the first non-empty, non-comment line after #EXTINF => the URL
   let url = null;
   let j = i + 1;
   while (j < linesMa.length) {
@@ -329,32 +329,27 @@ for (let i = 0; i < linesMa.length; i++) {
     break;
   }
 
-  if (!url) continue;               // no playable line found
-  if (url.startsWith("#")) continue; // safety (shouldn’t happen)
+  if (!url) continue;
+  if (url.startsWith("#")) continue;
 
-  // Don’t dedupe by name (names repeat a lot in iptv-org lists)
   data["Maghreb"].push({ name, url, logo });
-  pushedCount++;
-
-  // optional: skip ahead to the url line to avoid re-processing
   i = j;
 }
-
-// Optional debug (check in DevTools console)
-// console.log("ma.m3u EXTINF entries:", extinfCount, "→ pushed to Maghreb:", pushedCount);
-
 
         // Add Bein Sports iframe channels
         if(!data["Sports"]) data["Sports"]=[];
         const beinChannels = [
-          {name:"Bein Sports 1", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F201%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-1/"},
-          {name:"Bein Sports 2", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F202%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-2/"},
-          {name:"Bein Sports 3", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F203%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-3/"},
-          {name:"Bein Sports 4", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F204%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-4/"},
-          {name:"Bein Sports 5", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F205%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-5/"},
-          {name:"Bein Sports 6", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F206%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-6/"},
-          {name:"Bein Sports 7", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F207%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-7/"}
-        ];
+  {name:"Bein Sports 1", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F201%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-1/"},
+  {name:"Bein Sports 2", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F202%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-2/"},
+  {name:"Bein Sports 3", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F203%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-3/"},
+  {name:"Bein Sports 4", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F204%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-4/"},
+  {name:"Bein Sports 5", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F205%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-5/"},
+  {name:"Bein Sports 6", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F206%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-6/"},
+  {name:"Bein Sports 7", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F207%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-7/"},
+  {name:"Bein Sports News", logo:"https://assets.bein.com/mena/sites/4/2015/06/NEWS_DIGITAL_Mono.png", iframe:"https://direct.aflam4you.net/embed.php?vid=31"},
+  {name:"Bein Sports Xtra 1", logo:"https://assets.bein.com/mena/sites/4/2015/06/beIN_SPORTS_XTRA1_Digital_Mono.png", iframe:"https://direct.aflam4you.net/embed.php?vid=1001"},
+  {name:"Bein Sports Xtra 2", logo:"https://assets.bein.com/mena/sites/4/2015/06/beIN_SPORTS_XTRA2_Digital_Mono.png", iframe:"https://direct.aflam4you.net/embed.php?vid=1002"}
+];
         const existingSports = new Set(data["Sports"].map(c=>c.name));
         beinChannels.forEach(c=>{
             if(!existingSports.has(c.name)) data["Sports"].push(c);
@@ -379,6 +374,7 @@ function showCategories(){
         const icon = categoryIcons[cat]||"fa-tv";
         const card = document.createElement('div');
         card.className='card p-4 flex flex-col items-center';
+    card.setAttribute('tabindex','0'); // ✅ make focusable
         card.innerHTML=`<div class="w-16 h-16 mb-2 flex justify-center items-center text-2xl"><i class="fas ${icon}"></i></div>
                         <p class="text-center">${cat}</p>`;
         card.addEventListener('click',()=>showChannels(cat));
@@ -398,9 +394,10 @@ function showChannels(cat){
     data[cat].forEach(ch=>{
         const card=document.createElement('div');
         card.className='card p-2';
+        card.setAttribute('tabindex','0'); // ✅ make focusable
         card.innerHTML=`<div class="channel-logo mb-2 flex items-center justify-center">
             ${ch.logo?`<img class="w-full h-full object-contain p-2" src="${ch.logo}" alt="${ch.name}">`:`<i class="fas fa-play-circle text-4xl text-gray-400"></i>`}
-        </div><p>${ch.name}</p>`;
+</div><p>${ch.name}</p>`;
         card.addEventListener('click',()=>playChannel(ch));
         channelsList.appendChild(card);
         channelItems.push(card);
