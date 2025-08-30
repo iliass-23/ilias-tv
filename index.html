@@ -144,6 +144,26 @@ html, body {
 </style>
 </head>
 <body>
+<style>
+    /* Glassmorphism style for the cursor with a frosted glass effect */
+    #cursor {
+        width: 30px;
+        height: 30px;
+        background: rgba(255, 255, 255, 0.1); /* Slightly transparent white */
+        border-radius: 50%;
+        position: absolute;
+        pointer-events: none;
+        z-index: 1000;
+        backdrop-filter: blur(10px); /* Frosted glass effect */
+        border: 1px solid rgba(255, 255, 255, 0.3); /* Slight border for visibility */
+        transform: scale(1);
+        transition: transform 0.1s ease-out;
+    }
+</style>
+
+<!-- Glassmorphism Cursor -->
+<div id="cursor"></div>
+
 
 <!-- Fake Login -->
 <div id="fakeLogin" class="flex flex-col items-center justify-center h-screen text-center">
@@ -492,5 +512,51 @@ loadPlaylist();
 </script>
 
 </div> <!-- close #mainContent -->
+
+<script>
+    const cursor = document.getElementById('cursor');
+    let cursorX = window.innerWidth / 2;
+    let cursorY = window.innerHeight / 2;
+    const cursorSpeed = 20;  // Speed of the cursor movement
+
+    // Function to update cursor position
+    function updateCursorPosition(x, y) {
+        cursor.style.left = x + 'px';
+        cursor.style.top = y + 'px';
+    }
+
+    // Key events to move the cursor based on the remote control buttons
+    document.addEventListener('keydown', function(event) {
+        switch(event.keyCode) {
+            case 37: // LEFT arrow key
+                cursorX -= cursorSpeed;
+                break;
+            case 38: // UP arrow key
+                cursorY -= cursorSpeed;
+                break;
+            case 39: // RIGHT arrow key
+                cursorX += cursorSpeed;
+                break;
+            case 40: // DOWN arrow key
+                cursorY += cursorSpeed;
+                break;
+            case 13: // ENTER / SELECT button (center button on the remote)
+                const focusedElement = document.elementFromPoint(cursorX, cursorY);
+                if (focusedElement) {
+                    focusedElement.click();
+                }
+                break;
+        }
+
+        // Ensure the cursor stays within the screen boundaries
+        cursorX = Math.max(0, Math.min(cursorX, window.innerWidth - 30));
+        cursorY = Math.max(0, Math.min(cursorY, window.innerHeight - 30));
+
+        updateCursorPosition(cursorX, cursorY);
+    });
+
+    // Initialize cursor position
+    updateCursorPosition(cursorX, cursorY);
+</script>
 </body>
-</html>
+  </html>
