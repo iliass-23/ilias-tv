@@ -165,8 +165,6 @@ html, body {
     document.getElementById("mainContent").style.display = "block";
   }, 3200);
 </script>
-
-
 <script>
   setTimeout(() => {
     document.getElementById("introScreen").style.display = "none";
@@ -231,7 +229,7 @@ html, body {
 <video autoplay="" class="w-full" controls="" controlslist="nodownload" id="video-player" playsinline="" preload="metadata"></video>
 </div>
 <div class="iframe-container mb-4 hidden" id="iframe-container">
-      &lt;<iframe allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen="true" class="w-full" frameborder="0" height="600px" id="iframe-player" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
+<iframe allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen="true" class="w-full" frameborder="0" height="600px" id="iframe-player" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
 </div>
 <div class="bg-gray-800 bg-opacity-50 rounded-xl p-4 flex items-center space-x-4">
 <img alt="Logo" class="w-16 h-16 rounded-lg" id="playing-logo" src=""/>
@@ -373,12 +371,12 @@ for (let i = 0; i < linesMa.length; i++) {
   {name:"SSC 4 Sports", logo:"", iframe:"https://direct.aflam4you.net/embed.php?vid=106"},
   {name:"SSC 5 Sports", logo:"", iframe:"https://direct.aflam4you.net/embed.php?vid=116"},
   {name:"SSC 6 Sports", logo:"", iframe:"https://direct.aflam4you.net/embed.php?vid=1171"},
-  {name:"Bein Sports 1", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F201%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-1/"},
-  {name:"Bein Sports 2", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F202%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-2/"},
-  {name:"Bein Sports 3", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F203%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-3/"},
-  {name:"Bein Sports 4", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F204%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-4/"},
-  {name:"Bein Sports 5", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F205%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-5/"},
-  {name:"Bein Sports 6", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F206%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-6/"},
+  {name:"Bein Sports 1", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F201%2Fbein-sports-hd-1.png", iframe:"https://direct.aflam4you.net/embed.php?vid=68"},
+  {name:"Bein Sports 2", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F202%2Fbein-sports-hd-1.png", iframe:"https://direct.aflam4you.net/embed.php?vid=2"},
+  {name:"Bein Sports 3", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F203%2Fbein-sports-hd-1.png", iframe:"https://direct.aflam4you.net/embed.php?vid=1"},
+  {name:"Bein Sports 4", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F204%2Fbein-sports-hd-1.png", iframe:"https://direct.aflam4you.net/embed.php?vid=3"},
+  {name:"Bein Sports 5", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F205%2Fbein-sports-hd-1.png", iframe:"https://direct.aflam4you.net/embed.php?vid=73"},
+  {name:"Bein Sports 6", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F206%2Fbein-sports-hd-1.png", iframe:"https://direct.aflam4you.net/embed.php?vid=74"},
   {name:"Bein Sports 7", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F207%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-7/"},
   {name:"Bein Sports News", logo:"https://assets.bein.com/mena/sites/4/2015/06/NEWS_DIGITAL_Mono.png", iframe:"https://direct.aflam4you.net/embed.php?vid=31"},
   {name:"Bein Sports Xtra 1", logo:"https://assets.bein.com/mena/sites/4/2015/06/beIN_SPORTS_XTRA1_Digital_Mono.png", iframe:"https://direct.aflam4you.net/embed.php?vid=1001"},
@@ -524,20 +522,20 @@ searchInput.addEventListener('input',(e)=>{
 loadPlaylist();
 </script>
 </div> <!-- close #mainContent -->
-<script>
-    const cursor = document.getElementById('cursor');
-    let cursorX = window.innerWidth / 2;
-    let cursorY = window.innerHeight / 2;
-    const cursorSpeed = 20;  // Speed of the cursor movement
-
-    // Function to update cursor position
-    function updateCursorPosition(x, y) {
-        cursor.style.left = x + 'px';
-        cursor.style.top = y + 'px';
+<script></script><script>
+document.querySelectorAll('.channel-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const iframe = document.querySelector('iframe');
+    if (iframe) {
+      // Ensure fullscreen is requested right after user click
+      if (iframe.requestFullscreen) {
+        iframe.requestFullscreen();
+      } else if (iframe.webkitRequestFullscreen) { 
+        iframe.webkitRequestFullscreen();
+      } else if (iframe.msRequestFullscreen) { 
+        iframe.msRequestFullscreen();
+      }
     }
-
-    // Key events to move the cursor based on the remote control buttons
-    document.addEventListener('keydown', function(event) {
-        switch(event.keyCode) {
-            case 37: // LEFT arrow key
-                cur
+  });
+});
+</script></body></html>
