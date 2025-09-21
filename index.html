@@ -295,6 +295,134 @@ const categoryIcons = {
 const sscFallbackLogo = "https://r2.thesportsdb.com/images/media/channel/logo/3ftgj11637160967.png";
 
 
+
+
+// --- Improved Hls.js + CORS diagnostics + proxy fallback for Bein Sports 1 ---
+function appendDebug(msg){
+    let deb = document.getElementById('player-debug');
+    if(!deb){
+        deb = document.createElement('pre');
+        deb.id = 'player-debug';
+        deb.style.whiteSpace = 'pre-wrap';
+        deb.style.fontSize = '12px';
+        deb.style.color = '#ddd';
+        deb.style.background = 'rgba(0,0,0,0.4)';
+        deb.style.padding = '8px';
+        deb.style.borderRadius = '8px';
+        deb.style.marginTop = '8px';
+        document.getElementById('player-view').appendChild(deb);
+    }
+    deb.textContent += msg + '\n';
+    console.log(msg);
+}
+
+function showExternalButtons(url){
+    const pv = document.getElementById('player-view');
+    let ex = document.getElementById('external-links');
+    if(!ex){
+        ex = document.createElement('div');
+        ex.id='external-links';
+        ex.style.marginTop='8px';
+        ex.innerHTML = '<a class="px-4 py-2 bg-purple-600 rounded mr-2" href="'+url+'" target="_blank" rel="noopener">Open stream in new tab</a>' +
+                       '<a class="px-4 py-2 bg-gray-700 rounded" href="'+url+'" target="_blank" rel="noopener">Open in VLC / external player</a>';
+        pv.appendChild(ex);
+    } else {
+        ex.querySelector('a').href = url;
+    }
+}
+
+async function testAndPlay(url){
+    // Clear debug
+    const deb = document.getElementById('player-debug');
+    if(deb) deb.textContent = '';
+    appendDebug('Testing stream: ' + url);
+
+    // Mixed content check
+    if (location.protocol === 'https:' && url.startsWith('http:')) {
+        appendDebug('Mixed content detected: page is HTTPS but stream is HTTP. Trying HTTPS version...');
+        try {
+            const httpsUrl = url.replace(/^http:/,'https:');
+            const r = await fetch(httpsUrl, {method:'GET', mode:'cors'});
+            appendDebug('HTTPS attempt status: ' + r.status);
+            if (r.ok){
+                appendDebug('HTTPS reachable — using HTTPS URL.');
+                return attemptPlay(httpsUrl);
+            }
+        } catch(e){
+            appendDebug('HTTPS attempt failed: ' + e.message);
+        }
+        appendDebug('HTTPS attempt failed — will try proxies.');
+    }
+
+    // Try direct small-range fetch to detect CORS/network
+    try {
+        const r = await fetch(url, {method:'GET', mode:'cors', headers:{Range:'bytes=0-65535'}});
+        appendDebug('Direct fetch status: ' + r.status);
+        appendDebug('Content-Type: ' + r.headers.get('content-type'));
+        if (r.ok) return attemptPlay(url);
+    } catch(e){
+        appendDebug('Direct fetch failed (likely CORS/network): ' + e.message);
+    }
+
+    // Try proxies
+    const proxies = [
+        'https://corsproxy.io/?',
+        'https://api.allorigins.win/raw?url=',
+        'https://thingproxy.freeboard.io/fetch/'
+    ];
+    for (const p of proxies){
+        const proxied = p + encodeURIComponent(url);
+        appendDebug('Trying proxy: ' + p);
+        try {
+            const r2 = await fetch(proxied, {method:'GET', mode:'cors'});
+            appendDebug('Proxy response status: ' + r2.status);
+            if (r2.ok) return attemptPlay(proxied);
+        } catch(e){
+            appendDebug('Proxy fetch failed: ' + e.message);
+        }
+    }
+
+    // Last resort: set native video src and show external options
+    appendDebug('All attempts failed — setting native video src and offering external play.');
+    stopPlayback();
+    videoPlayer.src = url;
+    try{ await videoPlayer.play().catch(()=>{}); }catch(e){}
+    showExternalButtons(url);
+}
+
+function attemptPlay(playUrl){
+    appendDebug('Attempting playback with: ' + playUrl);
+    stopPlayback();
+    if (Hls.isSupported()){
+        currentHls = new Hls();
+        currentHls.loadSource(playUrl);
+        currentHls.attachMedia(videoPlayer);
+        currentHls.on(Hls.Events.MANIFEST_PARSED, ()=>videoPlayer.play().catch(()=>{}));
+        currentHls.on(Hls.Events.ERROR, (event, data) => {
+            appendDebug('Hls.js error: type=' + data.type + ' details=' + data.details + ' fatal=' + data.fatal);
+            if (data.fatal){
+                if (data.type === Hls.ErrorTypes.NETWORK_ERROR){
+                    appendDebug('Hls.js network error — attempting to start load again.');
+                    currentHls.startLoad();
+                } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR){
+                    appendDebug('Hls.js media error — attempting recovery.');
+                    currentHls.recoverMediaError();
+                } else {
+                    appendDebug('Hls.js fatal error — falling back to native video.');
+                    try{ currentHls.destroy(); }catch(e){}
+                    currentHls = null;
+                    videoPlayer.src = playUrl;
+                    videoPlayer.play().catch(()=>{});
+                    showExternalButtons(playUrl);
+                }
+            }
+        });
+    } else {
+        videoPlayer.src = playUrl;
+        videoPlayer.play().catch(()=>{});
+    }
+}
+
 async function loadPlaylist(){
     loading.classList.remove('hidden');
     try{
@@ -371,7 +499,7 @@ for (let i = 0; i < linesMa.length; i++) {
   {name:"SSC 4 Sports", logo:"", iframe:"https://direct.aflam4you.net/embed.php?vid=106"},
   {name:"SSC 5 Sports", logo:"", iframe:"https://direct.aflam4you.net/embed.php?vid=116"},
   {name:"SSC 6 Sports", logo:"", iframe:"https://direct.aflam4you.net/embed.php?vid=1171"},
-  {name:"Bein Sports 1", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F201%2Fbein-sports-hd-1.png", iframe:"https://direct.aflam4you.net/embed.php?vid=68"},
+  {name:"Bein Sports 1", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F201%2Fbein-sports-hd-1.png", url:"http://het104a.4rouwanda-shop.store/live/918454578001/index.m3u8"},
   {name:"Bein Sports 2", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F202%2Fbein-sports-hd-1.png", iframe:"https://direct.aflam4you.net/embed.php?vid=2"},
   {name:"Bein Sports 3", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F203%2Fbein-sports-hd-1.png", iframe:"https://direct.aflam4you.net/embed.php?vid=1"},
   {name:"Bein Sports 4", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F204%2Fbein-sports-hd-1.png", iframe:"https://direct.aflam4you.net/embed.php?vid=3"},
@@ -467,10 +595,14 @@ function playChannel(ch){
         iframeContainer.classList.add('hidden');
         videoContainer.classList.remove('hidden');
         if(Hls.isSupported()){
+            if (ch.name.includes('Bein Sports 1')) {
+            testAndPlay(ch.url);
+        } else {
             currentHls = new Hls();
             currentHls.loadSource(ch.url);
             currentHls.attachMedia(videoPlayer);
             currentHls.on(Hls.Events.MANIFEST_PARSED, ()=>videoPlayer.play().catch(()=>{}));
+        }
             currentHls.on(Hls.Events.ERROR,(event,data)=>{
                 if(data.fatal){
                     switch(data.type){
