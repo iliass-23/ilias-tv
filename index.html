@@ -1,673 +1,125 @@
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>ILIAS-TV - Futuristic IPTV</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1" />
+  <title>Website Closed — We'll be back</title>
+  <style>
+    :root{
+      --bg1:#0f172a;
+      --bg2:#071024;
+      --card:#0b1220;
+      --accent:#7c3aed;
+      --muted:rgba(255,255,255,0.65);
+      --glass: rgba(255,255,255,0.03);
+      --radius:16px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    html,body{height:100%;}
+    body{
+      margin:0;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.12), transparent), linear-gradient(180deg,var(--bg1),var(--bg2));
+      color: #e6eef8;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;align-items:center;justify-content:center;padding:16px;
+    }
 
-body {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg,#0F172A,#1E293B,#4C1D95);
-  min-height:100vh;
-  margin:0;
-  color:white;
-}
+    .wrapper{
+      width:100%;
+      max-width:980px;
+      display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:center;
+    }
 
-.container{
-  max-width:1200px;
-  margin:0 auto;
-  padding:20px;
-}
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:var(--radius);
+      padding:20px;
+      border:1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+    }
 
-header h1{
-  font-size:3rem;
-  background: linear-gradient(90deg,#8B5CF6,#4C1D95);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight:700;
-}
+    .brand{
+      display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap;
+    }
+    .logo{
+      width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#2dd4bf);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:white;
+      box-shadow:0 6px 22px rgba(124,58,237,0.18), inset 0 -6px 18px rgba(255,255,255,0.02);
+    }
+    h1{margin:0;font-size:24px;letter-spacing:-0.02em}
+    p.lead{margin-top:12px;color:var(--muted);line-height:1.5;font-size:15px}
 
-.grid-horizontal {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1rem;
-}
+    .right{
+      text-align:center;
+      padding:20px;
+      border-radius:12px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03);
+    }
 
-.card {
-  border-radius:20px;
-  overflow:hidden;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(12px);
-  border:1px solid rgba(255,255,255,0.1);
-  text-align:center;
-  cursor:pointer;
-  transition: all 0.3s ease;
-  aspect-ratio: 1 / 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
+    .status-emoji{font-size:40px;display:block;margin-bottom:6px}
+    .small{font-size:13px;color:var(--muted)}
 
-.card:hover{
-  transform: translateY(-6px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-}
+    .arabic{direction:rtl;text-align:right;font-weight:600;margin-top:16px;}
+    .arabic .title{font-size:18px;margin:0}
+    .arabic .text{color:var(--muted);margin-top:8px;line-height:1.6;font-size:14px}
 
-.channel-logo{
-  width:100%;
-  height:120px;
-  object-fit:contain;
-  background: rgba(0,0,0,0.2);
-  border-radius:12px;
-}
+    .spark{
+      position:absolute;right:10%;top:10%;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle at 30% 30%, rgba(124,58,237,0.14), transparent 30%);
+      filter:blur(22px);opacity:0.9;pointer-events:none;
+    }
 
-.video-container, .iframe-container{
-  border-radius:20px;
-  overflow:hidden;
-  background:#000;
-  border:1px solid rgba(255,255,255,0.1);
-}
+    @media (max-width:880px){
+      .wrapper{grid-template-columns:1fr;}
+      .right{order:-1;margin-bottom:16px}
+      h1{font-size:20px}
+      p.lead{font-size:14px}
+    }
 
-input#search-input{
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(12px);
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,0.15);
-  padding:0.5rem 1rem;
-  color:white;
-  width:100%;
-  max-width:300px;
-  transition: all 0.3s ease;
-}
-input#search-input:focus{
-  outline:none;
-  border:1px solid #8B5CF6;
-  box-shadow: 0 4px 15px rgba(139,92,246,0.3);
-}
-
-button{
-  transition: all 0.3s ease;
-}
-button:hover{
-  transform: translateY(-2px);
-}
-
-.scrollbar-thin::-webkit-scrollbar{
-  width:8px;
-}
-.scrollbar-thin::-webkit-scrollbar-track{
-  background:rgba(255,255,255,0.05);
-  border-radius:4px;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb{
-  background:rgba(139,92,246,0.5);
-  border-radius:4px;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb:hover{
-  background:rgba(139,92,246,0.8);
-}
-
-/* Responsive tweaks */
-@media (max-width: 640px) {
-  .grid-horizontal {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-@media (min-width: 641px) and (max-width: 1024px) {
-  .grid-horizontal {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-@media (min-width: 1025px) {
-  .grid-horizontal {
-    grid-template-columns: repeat(6, 1fr);
-  }
-}
-
-/* ✅ Force scrolling on all devices */
-html, body {
-  height: 100%;
-  overflow-y: auto !important;
-  overscroll-behavior: contain;
-}
-/* Remote navigation focus styles */
-.card:focus {
-  outline: 3px solid #8B5CF6;
-  transform: scale(1.05);
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.7);
-  z-index: 10;
-}
-</style>
+    @media (max-width:480px){
+      body{padding:12px;}
+      .logo{width:40px;height:40px;font-size:16px}
+      .card{padding:16px;}
+      .status-emoji{font-size:32px}
+    }
+  </style>
 </head>
 <body>
-<div class="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-purple-900 via-black to-purple-700 text-white z-50" id="introScreen">
-<h1 class="text-6xl font-extrabold mb-6 animate-intro">ILIAS-TV</h1>
-<p class="text-gray-300 text-lg">Premium IPTV Experience</p>
-</div>
-<style>
-@keyframes zoomFade {
-  0% { opacity: 0; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.05); }
-  100% { opacity: 0; transform: scale(1); }
-}
-.animate-intro {
-  animation: zoomFade 3s ease-in-out forwards;
-}
-</style>
-<script>
-  setTimeout(() => {
-    document.getElementById("introScreen").style.display = "none";
-    document.getElementById("mainContent").style.display = "block";
-  }, 3200);
-</script>
-<script>
-  setTimeout(() => {
-    document.getElementById("introScreen").style.display = "none";
-    document.getElementById("mainContent").style.display = "block";
-  }, 3000);
-</script>
-<style>
-    /* Glassmorphism style for the cursor with a frosted glass effect */
-    #cursor {
-        width: 30px;
-        height: 30px;
-        background: rgba(255, 255, 255, 0.1); /* Slightly transparent white */
-        border-radius: 50%;
-        position: absolute;
-        pointer-events: none;
-        z-index: 1000;
-        backdrop-filter: blur(10px); /* Frosted glass effect */
-        border: 1px solid rgba(255, 255, 255, 0.3); /* Slight border for visibility */
-        transform: scale(1);
-        transition: transform 0.1s ease-out;
-    }
-</style>
-<!-- Glassmorphism Cursor -->
-<div id="cursor"></div>
-<!-- Fake Login -->
-<!-- Real Website (hidden at first) -->
-<div id="mainContent" style="display:none;">
-<div class="container">
-<header class="text-center mb-6">
-<div class="flex justify-center items-center mb-3 space-x-3">
-<i class="fas fa-tv text-4xl text-purple-500"></i>
-<h1>ILIAS-TV</h1>
-</div>
-<p class="text-gray-300">Premium Arabic IPTV Streaming Experience</p>
-</header>
-<main id="app">
-<div class="text-center py-12 hidden" id="loading">
-<div class="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-<p>Loading channels...</p>
-</div>
-<!-- Categories -->
-<div class="grid-horizontal scrollbar-thin" id="categories-view"></div>
-<!-- Channels -->
-<div class="hidden" id="channels-view">
-<div class="mb-4 flex justify-between items-center flex-wrap gap-4">
-<input id="search-input" placeholder="Search channels..." type="text"/>
-<button class="px-4 py-2 bg-purple-500 rounded flex items-center" id="back-to-categories">
-<i class="fas fa-arrow-left mr-2"></i> Back
-      </button>
-</div>
-<div class="grid-horizontal scrollbar-thin" id="channels-list"></div>
-</div>
-<!-- Player -->
-<div class="hidden" id="player-view">
-<div class="mb-4 flex justify-between items-center flex-wrap gap-4">
-<h2 class="text-2xl font-bold" id="channel-name"></h2>
-<button class="px-4 py-2 bg-purple-500 rounded flex items-center" id="back-to-channels">
-<i class="fas fa-arrow-left mr-2"></i> Back
-      </button>
-</div>
-<div class="video-container mb-4" id="video-container">
-<video autoplay="" class="w-full" controls="" controlslist="nodownload" id="video-player" playsinline="" preload="metadata"></video>
-</div>
-<div class="iframe-container mb-4 hidden" id="iframe-container">
-<iframe allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen="true" class="w-full" frameborder="0" height="600px" id="iframe-player" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
-</div>
-<div class="bg-gray-800 bg-opacity-50 rounded-xl p-4 flex items-center space-x-4">
-<img alt="Logo" class="w-16 h-16 rounded-lg" id="playing-logo" src=""/>
-<div>
-<p class="font-medium" id="playing-channel"></p>
-<p class="text-gray-300 text-sm" id="playing-category"></p>
-</div>
-</div>
-<p class="text-sm text-gray-300 mt-2" id="player-hint"></p>
-</div>
-</main>
-<footer class="text-center mt-6 py-6 border-t border-gray-800">
-<p>Made with <span class="text-red-500">❤️</span> for Arabic TV lovers</p>
-<p class="text-gray-500 text-sm mt-2">© 2025 ILIAS-TV. All rights reserved.</p>
-<div class="mt-2 space-x-4">
-<a class="text-purple-400 hover:underline" href="https://iliass-23.github.io/ilias-tv/license.html" target="_blank">License</a>
-<a class="text-purple-400 hover:underline" href="https://iliass-23.github.io/ilias-tv/terms.html" target="_blank">Terms of Use</a>
-<a class="text-purple-400 hover:underline" href="https://iliass-23.github.io/ilias-tv/privacy.html" target="_blank">Privacy Policy</a>
-</div>
-</footer>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<script>
+  <div class="spark" aria-hidden></div>
+  <div class="wrapper">
+    <section class="card" aria-labelledby="title">
+      <div class="brand">
+        <div class="logo">WS</div>
+        <div>
+          <h1 id="title">Website temporarily closed</h1>
+          <p class="lead">We're working behind the scenes to improve the site and will be back soon with a better, faster experience. Thanks for your patience — we're on it.</p>
+        </div>
+      </div>
 
-// Elements
-const categoriesView = document.getElementById('categories-view');
-const channelsView = document.getElementById('channels-view');
-const channelsList = document.getElementById('channels-list');
-const playerView = document.getElementById('player-view');
-const videoContainer = document.getElementById('video-container');
-const videoPlayer = document.getElementById('video-player');
-const iframeContainer = document.getElementById('iframe-container');
-const iframePlayer = document.getElementById('iframe-player');
-const backToChannels = document.getElementById('back-to-channels');
-const backToCategories = document.getElementById('back-to-categories');
-const channelName = document.getElementById('channel-name');
-const playingLogo = document.getElementById('playing-logo');
-const playingChannel = document.getElementById('playing-channel');
-const playingCategory = document.getElementById('playing-category');
-const loading = document.getElementById('loading');
-const searchInput = document.getElementById('search-input');
+      <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap">
+        <div style="background:var(--glass);padding:8px 10px;border-radius:10px;font-weight:600;color:var(--muted);font-size:12px">Maintenance</div>
+        <div style="background:var(--glass);padding:8px 10px;border-radius:10px;font-weight:600;color:var(--muted);font-size:12px">Updates in progress</div>
+        <div style="background:var(--glass);padding:8px 10px;border-radius:10px;font-weight:600;color:var(--muted);font-size:12px">We'll be back soon</div>
+      </div>
 
-let data = {};
-let categoryItems = [];
-let channelItems = [];
-let currentCategory = '';
-let currentHls = null;
+      <div class="arabic">
+        <p class="title">الموقع مغلق مؤقتًا</p>
+        <p class="text">نقوم حاليًا بإجراء تحسينات على الموقع لتقديم تجربة أفضل. شكرًا لصبركم — سنعود قريبًا.</p>
+      </div>
 
-const categoryIcons = {
-    "News":"fa-newspaper",
-    "Sports":"fa-futbol",
-    "Movies":"fa-film",
-    "Music":"fa-music",
-    "Kids":"fa-child",
-    "Religion":"fa-star-and-crescent",
-    "Business":"fa-briefcase",
-    "Documentary":"fa-book",
-    "Comedy":"fa-mask",
-    "Cooking":"fa-utensils",
-    "Maghreb":"fa-flag",
-    "Other":"fa-tv"
-};
-const sscFallbackLogo = "https://r2.thesportsdb.com/images/media/channel/logo/3ftgj11637160967.png";
+      <p style="margin-top:20px;font-size:13px;color:var(--muted)">Need to reach us? <a href="mailto:iliasvisuals@gmail.com" style="color:var(--accent);text-decoration:none">iliasvisuals@gmail.com</a></p>
+    </section>
 
+    <aside class="right card" aria-label="status box">
+      <div class="status-emoji">🛠️</div>
+      <div style="font-weight:700;font-size:16px">Currently offline</div>
+      <div class="small" style="margin-top:8px">We're performing scheduled improvements. Thank you for your understanding.</div>
 
-
-
-// --- Improved Hls.js + CORS diagnostics + proxy fallback for Bein Sports 1 ---
-function appendDebug(msg){
-    let deb = document.getElementById('player-debug');
-    if(!deb){
-        deb = document.createElement('pre');
-        deb.id = 'player-debug';
-        deb.style.whiteSpace = 'pre-wrap';
-        deb.style.fontSize = '12px';
-        deb.style.color = '#ddd';
-        deb.style.background = 'rgba(0,0,0,0.4)';
-        deb.style.padding = '8px';
-        deb.style.borderRadius = '8px';
-        deb.style.marginTop = '8px';
-        document.getElementById('player-view').appendChild(deb);
-    }
-    deb.textContent += msg + '\n';
-    console.log(msg);
-}
-
-function showExternalButtons(url){
-    const pv = document.getElementById('player-view');
-    let ex = document.getElementById('external-links');
-    if(!ex){
-        ex = document.createElement('div');
-        ex.id='external-links';
-        ex.style.marginTop='8px';
-        ex.innerHTML = '<a class="px-4 py-2 bg-purple-600 rounded mr-2" href="'+url+'" target="_blank" rel="noopener">Open stream in new tab</a>' +
-                       '<a class="px-4 py-2 bg-gray-700 rounded" href="'+url+'" target="_blank" rel="noopener">Open in VLC / external player</a>';
-        pv.appendChild(ex);
-    } else {
-        ex.querySelector('a').href = url;
-    }
-}
-
-async function testAndPlay(url){
-    // Clear debug
-    const deb = document.getElementById('player-debug');
-    if(deb) deb.textContent = '';
-    appendDebug('Testing stream: ' + url);
-
-    // Mixed content check
-    if (location.protocol === 'https:' && url.startsWith('http:')) {
-        appendDebug('Mixed content detected: page is HTTPS but stream is HTTP. Trying HTTPS version...');
-        try {
-            const httpsUrl = url.replace(/^http:/,'https:');
-            const r = await fetch(httpsUrl, {method:'GET', mode:'cors'});
-            appendDebug('HTTPS attempt status: ' + r.status);
-            if (r.ok){
-                appendDebug('HTTPS reachable — using HTTPS URL.');
-                return attemptPlay(httpsUrl);
-            }
-        } catch(e){
-            appendDebug('HTTPS attempt failed: ' + e.message);
-        }
-        appendDebug('HTTPS attempt failed — will try proxies.');
-    }
-
-    // Try direct small-range fetch to detect CORS/network
-    try {
-        const r = await fetch(url, {method:'GET', mode:'cors', headers:{Range:'bytes=0-65535'}});
-        appendDebug('Direct fetch status: ' + r.status);
-        appendDebug('Content-Type: ' + r.headers.get('content-type'));
-        if (r.ok) return attemptPlay(url);
-    } catch(e){
-        appendDebug('Direct fetch failed (likely CORS/network): ' + e.message);
-    }
-
-    // Try proxies
-    const proxies = [
-        'https://corsproxy.io/?',
-        'https://api.allorigins.win/raw?url=',
-        'https://thingproxy.freeboard.io/fetch/'
-    ];
-    for (const p of proxies){
-        const proxied = p + encodeURIComponent(url);
-        appendDebug('Trying proxy: ' + p);
-        try {
-            const r2 = await fetch(proxied, {method:'GET', mode:'cors'});
-            appendDebug('Proxy response status: ' + r2.status);
-            if (r2.ok) return attemptPlay(proxied);
-        } catch(e){
-            appendDebug('Proxy fetch failed: ' + e.message);
-        }
-    }
-
-    // Last resort: set native video src and show external options
-    appendDebug('All attempts failed — setting native video src and offering external play.');
-    stopPlayback();
-    videoPlayer.src = url;
-    try{ await videoPlayer.play().catch(()=>{}); }catch(e){}
-    showExternalButtons(url);
-}
-
-function attemptPlay(playUrl){
-    appendDebug('Attempting playback with: ' + playUrl);
-    stopPlayback();
-    if (Hls.isSupported()){
-        currentHls = new Hls();
-        currentHls.loadSource(playUrl);
-        currentHls.attachMedia(videoPlayer);
-        currentHls.on(Hls.Events.MANIFEST_PARSED, ()=>videoPlayer.play().catch(()=>{}));
-        currentHls.on(Hls.Events.ERROR, (event, data) => {
-            appendDebug('Hls.js error: type=' + data.type + ' details=' + data.details + ' fatal=' + data.fatal);
-            if (data.fatal){
-                if (data.type === Hls.ErrorTypes.NETWORK_ERROR){
-                    appendDebug('Hls.js network error — attempting to start load again.');
-                    currentHls.startLoad();
-                } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR){
-                    appendDebug('Hls.js media error — attempting recovery.');
-                    currentHls.recoverMediaError();
-                } else {
-                    appendDebug('Hls.js fatal error — falling back to native video.');
-                    try{ currentHls.destroy(); }catch(e){}
-                    currentHls = null;
-                    videoPlayer.src = playUrl;
-                    videoPlayer.play().catch(()=>{});
-                    showExternalButtons(playUrl);
-                }
-            }
-        });
-    } else {
-        videoPlayer.src = playUrl;
-        videoPlayer.play().catch(()=>{});
-    }
-}
-
-async function loadPlaylist(){
-    loading.classList.remove('hidden');
-    try{
-        // Load Arabic playlist (ara.m3u)
-        const res = await fetch("https://iptv-org.github.io/iptv/languages/ara.m3u");
-        const text = await res.text();
-        const lines = text.split(/\r?\n/);
-        for(let i=0;i<lines.length;i++){
-            if(lines[i].startsWith("#EXTINF")){
-                const catMatch = lines[i].match(/group-title="(.*?)"/);
-                let category = catMatch ? catMatch[1] : "Other";
-                if(category.toLowerCase().includes("religion")) category="Religion";
-                else if(category.toLowerCase().includes("business")) category="Business";
-                else if(category.toLowerCase().includes("doc")) category="Documentary";
-                else if(category.toLowerCase().includes("comedy")) category="Comedy";
-                else if(category.toLowerCase().includes("cook")) category="Cooking";
-                else if(category.toLowerCase().includes("kids")) category="Kids";
-                else if(category.toLowerCase().includes("movie")) category="Movies";
-                else if(category.toLowerCase().includes("music")) category="Music";
-                else if(category.toLowerCase().includes("sport")) category="Sports";
-                else if(category.toLowerCase().includes("maghreb")) category="Maghreb";
-
-                const nameMatch = lines[i].match(/,(.*)$/);
-                const name = nameMatch ? nameMatch[1].trim() : "Unnamed";
-                const logoMatch = lines[i].match(/tvg-logo="(.*?)"/);
-                const logo = logoMatch ? logoMatch[1] : null;
-                const url = lines[i+1] ? lines[i+1].trim() : null;
-                if(!url || url.startsWith("#")) continue;
-                if(!data[category]) data[category]=[];
-                data[category].push({name,url,logo});
-            }
-        }
-
-      // --- Load ALL Moroccan channels (ma.m3u) into Maghreb ---
-if (!data["Maghreb"]) data["Maghreb"] = [];
-
-const resMa = await fetch("https://iptv-org.github.io/iptv/countries/ma.m3u");
-const textMa = await resMa.text();
-const linesMa = textMa.split(/\r?\n/);
-
-for (let i = 0; i < linesMa.length; i++) {
-  const line = linesMa[i];
-  if (!line.startsWith("#EXTINF")) continue;
-
-  const nameMatch = line.match(/,(.*)$/);
-  const name = nameMatch ? nameMatch[1].trim() : "Unnamed";
-
-  const logoMatch = line.match(/tvg-logo="(.*?)"/);
-  const logo = logoMatch ? logoMatch[1] : null;
-
-  let url = null;
-  let j = i + 1;
-  while (j < linesMa.length) {
-    const candidate = (linesMa[j] || "").trim();
-    if (candidate === "") { j++; continue; }
-    if (candidate.startsWith("#")) { j++; continue; }
-    url = candidate;
-    break;
-  }
-
-  if (!url) continue;
-  if (url.startsWith("#")) continue;
-
-  data["Maghreb"].push({ name, url, logo });
-  i = j;
-}
-
-        // Add Bein Sports iframe channels
-        if(!data["Sports"]) data["Sports"]=[];
-        const beinChannels = [
-  {name:"SSC 1 Sports", logo:"", iframe:"https://direct.aflam4you.net/embed.php?vid=167"},
-  {name:"SSC 2 Sports", logo:"", iframe:"https://direct.aflam4you.net/embed.php?vid=104"},
-  {name:"SSC 3 Sports", logo:"", iframe:"https://direct.aflam4you.net/embed.php?vid=105"},
-  {name:"SSC 4 Sports", logo:"", iframe:"https://direct.aflam4you.net/embed.php?vid=106"},
-  {name:"SSC 5 Sports", logo:"", iframe:"https://direct.aflam4you.net/embed.php?vid=116"},
-  {name:"SSC 6 Sports", logo:"", iframe:"https://direct.aflam4you.net/embed.php?vid=1171"},
-  {name:"Bein Sports 1", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F201%2Fbein-sports-hd-1.png", url:"http://het104a.4rouwanda-shop.store/live/918454578001/index.m3u8"},
-  {name:"Bein Sports 2", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F202%2Fbein-sports-hd-1.png", iframe:"https://direct.aflam4you.net/embed.php?vid=2"},
-  {name:"Bein Sports 3", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F203%2Fbein-sports-hd-1.png", iframe:"https://direct.aflam4you.net/embed.php?vid=1"},
-  {name:"Bein Sports 4", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F204%2Fbein-sports-hd-1.png", iframe:"https://direct.aflam4you.net/embed.php?vid=3"},
-  {name:"Bein Sports 5", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F205%2Fbein-sports-hd-1.png", iframe:"https://direct.aflam4you.net/embed.php?vid=73"},
-  {name:"Bein Sports 6", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F206%2Fbein-sports-hd-1.png", iframe:"https://direct.aflam4you.net/embed.php?vid=74"},
-  {name:"Bein Sports 7", logo:"https://img.kooora.com/?i=o%2Fh%2F1%2F207%2Fbein-sports-hd-1.png", iframe:"https://aa.yalla1shoot.club/albaplayer/sports-7/"},
-  {name:"Bein Sports News", logo:"https://assets.bein.com/mena/sites/4/2015/06/NEWS_DIGITAL_Mono.png", iframe:"https://direct.aflam4you.net/embed.php?vid=31"},
-  {name:"Bein Sports Xtra 1", logo:"https://assets.bein.com/mena/sites/4/2015/06/beIN_SPORTS_XTRA1_Digital_Mono.png", iframe:"https://direct.aflam4you.net/embed.php?vid=1001"},
-  {name:"Bein Sports Xtra 2", logo:"https://assets.bein.com/mena/sites/4/2015/06/beIN_SPORTS_XTRA2_Digital_Mono.png", iframe:"https://direct.aflam4you.net/embed.php?vid=1002"}
-];
-        const existingSports = new Set(data["Sports"].map(c=>c.name));
-        beinChannels.forEach(c=>{
-            if(!existingSports.has(c.name)) data["Sports"].push(c);
-        });
-
-        
-        // Force SSC channels to always use the new SSC logo
-        Object.keys(data).forEach(cat => {
-            if (!data[cat]) return;
-            data[cat] = data[cat].map(ch => {
-                if (/ssc/i.test(ch.name)) {
-                    return { ...ch, logo: sscFallbackLogo };
-                }
-                return ch;
-            });
-        });
-showCategories();
-    }catch(e){
-        console.error(e);
-        alert("Failed to load playlist");
-    }
-}
-
-
-function showCategories(){
-    loading.classList.add('hidden');
-    categoriesView.classList.remove('hidden');
-    channelsView.classList.add('hidden');
-    playerView.classList.add('hidden');
-    categoriesView.innerHTML='';
-    categoryItems=[];
-    Object.keys(data).forEach(cat=>{
-        const icon = categoryIcons[cat]||"fa-tv";
-        const card = document.createElement('div');
-        card.className='card p-4 flex flex-col items-center';
-    card.setAttribute('tabindex','0'); // ✅ make focusable
-        card.innerHTML=`<div class="w-16 h-16 mb-2 flex justify-center items-center text-2xl"><i class="fas ${icon}"></i></div>
-                        <p class="text-center">${cat}</p>`;
-        card.addEventListener('click',()=>showChannels(cat));
-        categoriesView.appendChild(card);
-        categoryItems.push(card);
-    });
-}
-
-function showChannels(cat){
-    currentCategory=cat;
-    categoriesView.classList.add('hidden');
-    channelsView.classList.remove('hidden');
-    playerView.classList.add('hidden');
-    channelsList.innerHTML='';
-    channelItems=[];
-    if(!data[cat]) return;
-    data[cat].forEach(ch=>{
-        const card=document.createElement('div');
-        card.className='card p-2';
-        card.setAttribute('tabindex','0'); // ✅ make focusable
-        card.innerHTML=`<div class="channel-logo mb-2 flex items-center justify-center">
-            ${(/\bssc\b/i.test(ch.name))? `<img class="w-full h-full object-contain p-2" src="${sscFallbackLogo}" alt="${ch.name}">`: (ch.logo? `<img class="w-full h-full object-contain p-2" src="${ch.logo}" alt="${ch.name}">`: `<i class="fas fa-play-circle text-4xl text-gray-400"></i>`)}
-</div><p>${ch.name}</p>`;
-        card.addEventListener('click',()=>playChannel(ch));
-        channelsList.appendChild(card);
-        channelItems.push(card);
-    });
-    searchInput.value='';
-}
-
-function playChannel(ch){
-    categoriesView.classList.add('hidden');
-    channelsView.classList.add('hidden');
-    playerView.classList.remove('hidden');
-    channelName.textContent=ch.name;
-    playingLogo.src=(/\bssc\b/i.test(ch.name) ? sscFallbackLogo : (ch.logo||''));
-    playingChannel.textContent=ch.name;
-    playingCategory.textContent=currentCategory;
-
-    stopPlayback();
-
-    if(ch.iframe){
-        videoContainer.classList.add('hidden');
-        iframeContainer.classList.remove('hidden');
-        iframePlayer.src=ch.iframe;
-    }else{
-        iframeContainer.classList.add('hidden');
-        videoContainer.classList.remove('hidden');
-        if(Hls.isSupported()){
-            if (ch.name.includes('Bein Sports 1')) {
-            testAndPlay(ch.url);
-        } else {
-            currentHls = new Hls();
-            currentHls.loadSource(ch.url);
-            currentHls.attachMedia(videoPlayer);
-            currentHls.on(Hls.Events.MANIFEST_PARSED, ()=>videoPlayer.play().catch(()=>{}));
-        }
-            currentHls.on(Hls.Events.ERROR,(event,data)=>{
-                if(data.fatal){
-                    switch(data.type){
-                        case Hls.ErrorTypes.NETWORK_ERROR: currentHls.startLoad(); break;
-                        case Hls.ErrorTypes.MEDIA_ERROR: currentHls.recoverMediaError(); break;
-                        default: stopPlayback(); alert('Playback error'); break;
-                    }
-                }
-            });
-        }else{
-            videoPlayer.src = ch.url;
-            videoPlayer.play().catch(()=>{});
-        }
-    }
-}
-
-function stopPlayback(){
-    if(currentHls){ 
-        try{ currentHls.destroy(); }catch{} 
-        currentHls = null; 
-    }
-    videoPlayer.pause();
-    videoPlayer.removeAttribute('src');
-    videoPlayer.load();
-    iframePlayer.src = '';
-}
-
-// Back buttons
-backToChannels.addEventListener('click',()=>{
-    stopPlayback();
-    playerView.classList.add('hidden');
-    showChannels(currentCategory);
-});
-backToCategories.addEventListener('click',()=>{
-    stopPlayback();
-    channelsView.classList.add('hidden');
-    showCategories();
-});
-
-// Search filter
-searchInput.addEventListener('input',(e)=>{
-    const query = e.target.value.toLowerCase();
-    channelItems.forEach(card=>{
-        const name = card.querySelector('p').textContent.toLowerCase();
-        card.style.display = name.includes(query) ? 'block' : 'none';
-    });
-});
-
-loadPlaylist();
-</script>
-</div> <!-- close #mainContent -->
-<script></script><script>
-document.querySelectorAll('.channel-item').forEach(item => {
-  item.addEventListener('click', () => {
-    const iframe = document.querySelector('iframe');
-    if (iframe) {
-      // Ensure fullscreen is requested right after user click
-      if (iframe.requestFullscreen) {
-        iframe.requestFullscreen();
-      } else if (iframe.webkitRequestFullscreen) { 
-        iframe.webkitRequestFullscreen();
-      } else if (iframe.msRequestFullscreen) { 
-        iframe.msRequestFullscreen();
-      }
-    }
-  });
-});
-</script></body></html>
+      <div style="margin-top:18px">
+        <div style="font-size:12px;color:var(--muted);">Estimated return</div>
+        <div style="font-weight:700;margin-top:6px">Within a few hours</div>
+      </div>
+    </aside>
+  </div>
+</body>
+</html>
